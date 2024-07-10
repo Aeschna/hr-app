@@ -12,15 +12,15 @@
         </div>
         <div class="form-group">
             <label for="address">Address</label>
-            <input type="text" class="form-control" id="address" name="address" value="{{ $company->address }}">
+            <input type="text" class="form-control" id="address" name="address" value="{{ $company->address }}" required>
         </div>
         <div class="form-group">
             <label for="phone">Phone</label>
-            <input type="text" class="form-control" id="phone" name="phone" value="{{ $company->phone }}">
+            <input type="text" class="form-control" id="phone" name="phone" value="{{ $company->phone }}" required>
         </div>
         <div class="form-group">
             <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" name="email" value="{{ $company->email }}">
+            <input type="email" class="form-control" id="email" name="email" value="{{ $company->email }}" required>
         </div>
         <div class="form-group">
             <label for="logo">Logo</label>
@@ -28,7 +28,7 @@
         </div>
         <div class="form-group">
             <label for="website">Website</label>
-            <input type="text" class="form-control" id="website" name="website" value="{{ $company->website }}">
+            <input type="text" class="form-control" id="website" name="website" value="{{ $company->website }}" required>
         </div>
         <button type="submit" class="btn btn-primary">Update</button>
     </form>
