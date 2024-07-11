@@ -22,11 +22,12 @@ class CompanyRequest extends FormRequest
     public function rules(): array
     {
         return [
-           'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'nullable|email|max:255|unique:employees,email,' . $this->employee,
-            'phone' => 'nullable|string|max:15',
-            'company_id' => 'required|exists:companies,id',
+            'name' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'phone' => 'required|string|max:15',
+            'email' => 'required|email|max:255|unique:companies',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|dimensions:min_width=100,min_height=100',
+            'website' => 'required|url|max:255',
         ];
     }
 }
