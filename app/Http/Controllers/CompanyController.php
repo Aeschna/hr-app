@@ -105,8 +105,24 @@ class CompanyController extends Controller
             Storage::delete('public/' . $company->logo);
         }
 
-        $company->delete();
+        $company->is_deleted = true;
+        $company->save();
+
         return redirect()->route('companies.index')->with('success', 'Company deleted successfully.');
     }
+    public function search(Request $request)
+{
+    $query = $request->input('query');
+    $companies = Company::where('name', 'like', "%$query%")
+        ->orWhere('address', 'like', "%$query%")
+        ->orWhere('phone', 'like', "%$query%")
+        ->orWhere('email', 'like', "%$query%")
+        ->orWhere('website', 'like', "%$query%")
+        ->paginate(10);
+
+    return view('companies.index', compact('companies'));
+}
+    
+
     
 }

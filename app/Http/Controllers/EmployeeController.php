@@ -73,8 +73,25 @@ class EmployeeController extends Controller
      */
     public function destroy(Employee $employee)
     {
+        
         $employee->delete();
         return redirect()->route('employees.index')->with('success', 'Employee deleted successfully.');
     }
+    public function search(Request $request)
+{
+    $query = $request->input('query');
+    $employees = Employee::where('first_name', 'like', "%$query%")
+        ->orWhere('last_name', 'like', "%$query%")
+        ->orWhere('email', 'like', "%$query%")
+        ->orWhere('phone', 'like', "%$query%")
+        ->orWhereHas('company', function($q) use ($query) {
+            $q->where('name', 'like', "%$query%");
+        })
+        ->paginate(10);
+
+    return view('employees.index', compact('employees'));
+}
+ 
+
     
 }

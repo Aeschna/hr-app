@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HR App</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <!-- Place additional stylesheets or scripts here -->
 </head>
 <body>
@@ -17,6 +18,8 @@
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+             
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('companies.index') }}">Companies</a>
                 </li>

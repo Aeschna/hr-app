@@ -4,6 +4,17 @@
 <div class="container">
     <h2>Employees</h2>
     <a href="{{ route('employees.create') }}" class="btn btn-primary">Add Employee</a>
+    <form action="{{ route('employees.search') }}" method="GET" class="mt-3">
+        <div class="input-group mb-3">
+            <input type="text" name="query" class="form-control" placeholder="Search employees...">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="submit"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+    </form>
+    @if (request()->has('query'))
+        <a href="{{ route('employees.index') }}" class="btn btn-secondary mb-3">Back to Employees</a>
+    @endif
     <table class="table table-bordered mt-3">
         <thead>
             <tr>
@@ -24,9 +35,8 @@
                 <td>{{ $employee->phone }}</td>
                 <td>{{ $employee->company->name }}</td>
                 <td>
-                <a href="{{ route('employees.show', $employee->id) }}" class="btn btn-info">View</a>
-                <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-warning">Edit</a>
-                <form action="{{ route('employees.destroy', $employee->id) }}" method="POST" style="display:inline;">
+                    <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-warning">Edit</a>
+                    <form action="{{ route('employees.destroy', $employee->id) }}" method="POST" style="display:inline;">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-danger">Delete</button>
