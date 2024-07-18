@@ -25,6 +25,19 @@
                 </li>
                 <!-- Add more navigation items as needed -->
             </ul>
+            
+            <!-- Right-side navigation items -->
+            <ul class="navbar-nav ml-auto">
+                @auth
+                    <li class="nav-item">
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="btn btn-link nav-link">Logout</button>
+                        </form>
+                    </li>
+                @endauth
+                <!-- Add login/register links for guests if needed -->
+            </ul>
         </div>
     </nav>
 

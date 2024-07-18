@@ -3,7 +3,20 @@
 @section('content')
 <div class="container">
     <h1>Edit Company</h1>
-    <form action="{{ route('companies.update', $company) }}" method="POST" enctype="multipart/form-data">
+
+<!-- Validation Errors -->
+@if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+
+    <form action="{{ route('companies.update', $company->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
         <div class="form-group">
@@ -23,8 +36,11 @@
             <input type="email" class="form-control" id="email" name="email" value="{{ $company->email }}" required>
         </div>
         <div class="form-group">
-            <label for="logo">Logo</label>
-            <input type="file" class="form-control" id="logo" name="logo">
+        <label for="logo">Logo</label>
+            <input type="file" class="form-control-file" id="logo" name="logo">
+            @if($company->logo)
+                <img src="{{ asset('storage/' . $company->logo) }}" alt="Company Logo" style="width: 100px; height: 100px;">
+            @endif
         </div>
         <div class="form-group">
             <label for="website">Website</label>

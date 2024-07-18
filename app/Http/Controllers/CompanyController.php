@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Storage;
 
 class CompanyController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+
+    }
     /**
      * Display a listing of the resource.
      */
@@ -83,7 +88,7 @@ class CompanyController extends Controller
             $logo = $request->file('logo');
             $logoName = time() . '.' . $logo->getClientOriginalExtension();
             $logo->storeAs('public/logos', $logoName);
-            $company->logo = 'logos/' . $logoName;
+            $validatedData['logo'] = 'logos/' . $logoName;
         }
 
         $company->update($validatedData);
@@ -103,4 +108,5 @@ class CompanyController extends Controller
         $company->delete();
         return redirect()->route('companies.index')->with('success', 'Company deleted successfully.');
     }
+    
 }

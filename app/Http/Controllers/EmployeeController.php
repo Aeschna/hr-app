@@ -9,9 +9,11 @@ use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public function __construct()
+    {
+        $this->middleware('auth'); // Require authentication for all methods
+    }  
+     
     public function index()
     {
         $employees = Employee::paginate(10);
@@ -74,4 +76,5 @@ class EmployeeController extends Controller
         $employee->delete();
         return redirect()->route('employees.index')->with('success', 'Employee deleted successfully.');
     }
+    
 }
