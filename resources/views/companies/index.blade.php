@@ -52,6 +52,31 @@
             @endforelse
         </tbody>
     </table>
-    {{ $companies->links() }}
+
+<!-- pagination -->
+
+    <nav aria-label="Page navigation">
+    <ul class="pagination pagination-sm">
+        <li class="page-item {{ $companies->onFirstPage() ? 'disabled' : '' }}">
+            <a class="page-link" href="{{ $companies->previousPageUrl() }}" aria-label="Previous">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+        </li>
+
+        @for ($i = 1; $i <= $companies->lastPage(); $i++)
+            <li class="page-item {{ $i == $companies->currentPage() ? 'active' : '' }}">
+                <a class="page-link" href="{{ $companies->url($i) }}">{{ $i }}</a>
+            </li>
+        @endfor
+
+        <li class="page-item {{ $companies->hasMorePages() ? '' : 'disabled' }}">
+            <a class="page-link" href="{{ $companies->nextPageUrl() }}" aria-label="Next">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        </li>
+    </ul>
+</nav>
+
+
 </div>
 @endsection

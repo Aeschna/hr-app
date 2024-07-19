@@ -45,7 +45,31 @@
             </tr>
             @endforeach
         </tbody>
-    </table>
-    {{ $employees->links() }}
+        </table>
+
+<!-- pagination -->
+
+        <nav aria-label="Page navigation">
+        <ul class="pagination pagination-sm justify-content-center">
+            <li class="page-item {{ $employees->onFirstPage() ? 'disabled' : '' }}">
+                <a class="page-link" href="{{ $employees->previousPageUrl() }}" aria-label="Previous">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+
+            @for ($i = 1; $i <= $employees->lastPage(); $i++)
+                <li class="page-item {{ $i == $employees->currentPage() ? 'active' : '' }}">
+                    <a class="page-link" href="{{ $employees->url($i) }}">{{ $i }}</a>
+                </li>
+            @endfor
+
+            <li class="page-item {{ $employees->hasMorePages() ? '' : 'disabled' }}">
+                <a class="page-link" href="{{ $employees->nextPageUrl() }}" aria-label="Next">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
 </div>
 @endsection
