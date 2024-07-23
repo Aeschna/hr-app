@@ -4,6 +4,9 @@
 <div class="container">
     <h2>Companies</h2>
     <a href="{{ route('companies.create') }}" class="btn btn-primary">Add Company</a>
+
+
+    <!-- Search Form -->
     <form action="{{ route('companies.search') }}" method="GET" class="mt-3">
         <div class="input-group mb-3">
             <input type="text" name="query" class="form-control" placeholder="Search companies...">
@@ -12,6 +15,17 @@
             </div>
         </div>
     </form>
+
+    <!-- Dropdown Button for Results Per Page -->
+    <form action="{{ route('companies.index') }}" method="GET" class="form-inline mb-3">
+        <label for="per_page" class="mr-2">Results per page: </label>
+        <select name="per_page" id="per_page" class="form-control" onchange="this.form.submit()">
+            @foreach($perPageOptions as $option)
+                <option value="{{ $option }}" {{ $perPage == $option ? 'selected' : '' }}>{{ $option }}</option>
+            @endforeach
+        </select>
+    </form>
+
     @if (request()->has('query'))
         <a href="{{ route('companies.index') }}" class="btn btn-secondary mb-3">Back to Companies</a>
     @endif

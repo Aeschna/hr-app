@@ -17,10 +17,14 @@ class CompanyController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $companies = Company::paginate(10);
-        return view('companies.index', compact('companies'));
+        $perPageOptions = [10, 50, 100];
+    $perPage = $request->input('per_page', 10);
+
+    $companies = Company::paginate($perPage);
+
+    return view('companies.index', compact('companies', 'perPageOptions', 'perPage'));
     }
 
     /**

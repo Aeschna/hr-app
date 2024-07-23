@@ -12,6 +12,18 @@
             </div>
         </div>
     </form>
+
+<!-- Dropdown Button for Results Per Page -->
+<form action="{{ route('employees.index') }}" method="GET" class="form-inline mb-3">
+        <label for="per_page" class="mr-2">Results per page: </label>
+        <select name="per_page" id="per_page" class="form-control" onchange="this.form.submit()">
+            @foreach($perPageOptions as $option)
+                <option value="{{ $option }}" {{ $perPage == $option ? 'selected' : '' }}>{{ $option }}</option>
+            @endforeach
+        </select>
+    </form>
+
+
     @if (request()->has('query'))
         <a href="{{ route('employees.index') }}" class="btn btn-secondary mb-3">Back to Employees</a>
     @endif

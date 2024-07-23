@@ -14,10 +14,15 @@ class EmployeeController extends Controller
         $this->middleware('auth'); // Require authentication for all methods
     }  
      
-    public function index()
+    public function index(Request $request)
     {
-        $employees = Employee::paginate(10);
-        return view('employees.index', compact('employees'));
+        $perPageOptions = [10, 50, 100];
+        $perPage = $request->input('per_page', 10);
+    
+        $employees = Employee::paginate($perPage);
+    
+        return view('employees.index', compact('employees', 'perPageOptions', 'perPage'));
+        
     }
 
     /**
