@@ -117,14 +117,17 @@ class CompanyController extends Controller
     public function search(Request $request)
 {
     $query = $request->input('query');
+    $perPageOptions = [10, 50, 100];
+    $perPage = $request->input('per_page', 10);
+
     $companies = Company::where('name', 'like', "%$query%")
         ->orWhere('address', 'like', "%$query%")
         ->orWhere('phone', 'like', "%$query%")
         ->orWhere('email', 'like', "%$query%")
-        ->orWhere('website', 'like', "%$query%")
-        ->paginate(10);
-
-    return view('companies.index', compact('companies'));
+        ->orWhere('website', 'like', "%$query%" )->paginate($perPage);
+         
+         return view('companies.index', compact('companies', 'perPageOptions', 'perPage'));
+    
 }
     
 

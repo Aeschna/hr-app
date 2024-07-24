@@ -85,6 +85,9 @@ class EmployeeController extends Controller
     public function search(Request $request)
 {
     $query = $request->input('query');
+    $perPageOptions = [10, 50, 100];
+    $perPage = $request->input('per_page', 10);
+
     $employees = Employee::where('first_name', 'like', "%$query%")
         ->orWhere('last_name', 'like', "%$query%")
         ->orWhere('email', 'like', "%$query%")
@@ -92,10 +95,11 @@ class EmployeeController extends Controller
         ->orWhereHas('company', function($q) use ($query) {
             $q->where('name', 'like', "%$query%");
         })
-        ->paginate(10);
+        ->paginate($perPage);
 
-    return view('employees.index', compact('employees'));
+    return view('employees.index', compact('employees', 'perPageOptions', 'perPage'));
 }
+
  
 
     
