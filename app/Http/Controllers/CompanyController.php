@@ -22,7 +22,7 @@ class CompanyController extends Controller
         $perPageOptions = [10, 50, 100];
     $perPage = $request->input('per_page', 10);
 
-    $companies = Company::paginate($perPage);
+    $companies = Company::withTrashed()->paginate($perPage);
 
     return view('companies.index', compact('companies', 'perPageOptions', 'perPage'));
     }
@@ -109,11 +109,23 @@ class CompanyController extends Controller
             Storage::delete('public/' . $company->logo);
         }
 
-        $company->is_deleted = true;
-        $company->save();
+        $company->delete();
 
         return redirect()->route('companies.index')->with('success', 'Company deleted successfully.');
     }
+
+    public function restore($id)
+    {
+        $company = Company::withTrashed()->find($id);
+
+        if ($company && $company->trashed()) {
+            $company->restore();
+            return redirect()->route('companies.index')->with('success', 'Company restored successfully.');
+        }
+
+        return redirect()->route('companies.index')->with('error', 'Company not found or not deleted.');
+    }
+
     public function search(Request $request)
 {
     $query = $request->input('query');

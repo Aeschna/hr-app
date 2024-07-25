@@ -18,14 +18,20 @@ Route::get('/employees/search', [EmployeeController::class, 'search'])->name('em
 // Middleware group for authenticated users
 Route::group(['middleware' => ['auth']], function() {
 
+    
+
+   
+
+
     Route::resource('companies', CompanyController::class);
     Route::resource('employees', EmployeeController::class);
     Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
+    
 
 
     // Admin-only routes (ensure admin middleware is properly defined)
     Route::group(['middleware' => ['admin']], function() {
-        
+    
     });
 
     // Allow employees to view companies and employees but not modify
@@ -38,3 +44,7 @@ Auth::routes(['register' => false]);
 
 // Logout route
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
+
+//Soft Delete Restore routes
+Route::post('/companies/{company}/restore', [CompanyController::class, 'restore'])->name('companies.restore');
+Route::put('employees/{id}/restore', [EmployeeController::class, 'restore'])->name('employees.restore');

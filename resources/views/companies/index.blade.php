@@ -5,7 +5,6 @@
     <h2>Companies</h2>
     <a href="{{ route('companies.create') }}" class="btn btn-primary">Add Company</a>
 
-
     <!-- Search Form -->
     <form action="{{ route('companies.search') }}" method="GET" class="mt-3">
         <div class="input-group mb-3">
@@ -29,6 +28,7 @@
     @if (request()->has('query'))
         <a href="{{ route('companies.index') }}" class="btn btn-secondary mb-3">Back to Companies</a>
     @endif
+
     <table class="table table-bordered mt-3">
         <thead>
             <tr>
@@ -43,32 +43,49 @@
         </thead>
         <tbody>
             @forelse ($companies as $company)
-            <tr>
-                <td>{{ $company->name }}</td>
-                <td>{{ $company->address }}</td>
-                <td>{{ $company->phone }}</td>
-                <td>{{ $company->email }}</td>
-                <td><img src="{{ asset('storage/' . $company->logo) }}" alt="{{ $company->name }}" width="100" height="100"></td>
-                <td><a href="{{ $company->website }}" target="_blank">{{ $company->website }}</a></td>
-                <td>
-                    <a href="{{ route('companies.edit', $company->id) }}" class="btn btn-warning">Edit</a>
-                    <form action="{{ route('companies.destroy', $company->id) }}" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                    </form>
-                </td>
-            </tr>
+                <tr>
+                    <td>{{ $company->name }}</td>
+                    <td>{{ $company->address }}</td>
+                    <td>{{ $company->phone }}</td>
+                    <td>{{ $company->email }}</td>
+                    <td><img src="{{ asset('storage/' . $company->logo) }}" alt="{{ $company->name }}" width="100" height="100"></td>
+                    <td><a href="{{ $company->website }}" target="_blank">{{ $company->website }}</a></td>
+                    <td>
+                        @if($company->trashed())
+                            <form action="{{ route('companies.restore', $company->id) }}" method="POST" style="display:inline;">
+                                @csrf
+                                <button type="submit" class="btn btn-success">Restore</button>
+                            </form>
+                        @else
+                            <a href="{{ route('companies.edit', $company->id) }}" class="btn btn-warning">Edit</a>
+                            <form action="{{ route('companies.destroy', $company->id) }}" method="POST" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        @endif
+                    </td>
+                </tr>
             @empty
-            <tr>
-                <td colspan="7" class="text-center">No companies found.</td>
-            </tr>
+                <tr>
+                    <td colspan="7" class="text-center">No companies found.</td>
+                </tr>
             @endforelse
         </tbody>
     </table>
 
-<!-- Pagination -->
-<nav aria-label="Page navigation">
+<!-- Checkbox for Filter -->
+<form method="GET" action="{{ route('employees.index') }}">
+    <div class="form-group">
+        <input type="checkbox" name="include_trashed" id="include_trashed" {{ request()->query('include_trashed') ? 'checked' : '' }}>
+        <label for="include_trashed">Silinenleri Göster</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Filtrele</button>
+</form>
+
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation">
         <ul class="pagination justify-content-center pagination-sm">
             <li class="page-item {{ $companies->onFirstPage() ? 'disabled' : '' }}">
                 <a class="page-link" href="{{ $companies->previousPageUrl() }}" aria-label="Previous">

@@ -15,15 +15,36 @@ class EmployeeController extends Controller
     }  
      
     public function index(Request $request)
-    {
-        $perPageOptions = [10, 50, 100];
-        $perPage = $request->input('per_page', 10);
-    
-        $employees = Employee::paginate($perPage);
-    
-        return view('employees.index', compact('employees', 'perPageOptions', 'perPage'));
-        
+{
+    $query = $request->input('query');
+    $perPageOptions = [10, 50, 100];
+    $perPage = $request->input('per_page', 10);
+    $includeTrashed = $request->has('include_trashed');
+
+    $employeesQuery = Employee::query();
+
+    if ($includeTrashed) {
+        $employeesQuery->withTrashed();
     }
+
+    if ($query) {
+        $employeesQuery->where(function ($q) use ($query) {
+            $q->where('first_name', 'like', "%$query%")
+              ->orWhere('last_name', 'like', "%$query%")
+              ->orWhere('email', 'like', "%$query%")
+              ->orWhere('phone', 'like', "%$query%")
+              ->orWhereHas('company', function ($q) use ($query) {
+                  $q->where('name', 'like', "%$query%");
+              });
+        });
+    }
+
+    $employees = $employeesQuery->paginate($perPage);
+
+    return view('employees.index', compact('employees', 'perPageOptions', 'perPage', 'includeTrashed'));
+}
+
+
 
     /**
      * Show the form for creating a new resource.
@@ -76,29 +97,51 @@ class EmployeeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Employee $employee)
+    public function destroy( $id)
     {
         
+        $employee = Employee::findOrFail($id);
         $employee->delete();
         return redirect()->route('employees.index')->with('success', 'Employee deleted successfully.');
     }
+    public function restore($id)
+    {
+        $employee = Employee::withTrashed()->findOrFail($id);
+        $employee->restore();
+    
+        return redirect()->route('employees.index')->with('success', 'Çalışan başarıyla geri yüklendi.');
+    }
+    
+
+
     public function search(Request $request)
-{
-    $query = $request->input('query');
-    $perPageOptions = [10, 50, 100];
-    $perPage = $request->input('per_page', 10);
+    {
+        $query = $request->input('query');
+        $perPageOptions = [10, 50, 100];
+        $perPage = $request->input('per_page', 10);
+        $includeTrashed = $request->input('include_trashed', false);
+    
+        $employees = Employee::query()
+            ->where(function ($q) use ($query) {
+                $q->where('first_name', 'like', "%$query%")
+                    ->orWhere('last_name', 'like', "%$query%")
+                    ->orWhere('email', 'like', "%$query%")
+                    ->orWhere('phone', 'like', "%$query%")
+                    ->orWhereHas('company', function($q) use ($query) {
+                        $q->where('name', 'like', "%$query%");
+                    });
+            })
+            ->when($includeTrashed, function ($q) {
+                return $q->withTrashed();
+            })
+            ->paginate($perPage);
+    
+        return view('employees.index', compact('employees', 'perPageOptions', 'perPage'));
+    }
+    
+    
 
-    $employees = Employee::where('first_name', 'like', "%$query%")
-        ->orWhere('last_name', 'like', "%$query%")
-        ->orWhere('email', 'like', "%$query%")
-        ->orWhere('phone', 'like', "%$query%")
-        ->orWhereHas('company', function($q) use ($query) {
-            $q->where('name', 'like', "%$query%");
-        })
-        ->paginate($perPage);
 
-    return view('employees.index', compact('employees', 'perPageOptions', 'perPage'));
-}
 
  
 
