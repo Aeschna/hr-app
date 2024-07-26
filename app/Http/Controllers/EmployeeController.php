@@ -16,32 +16,18 @@ class EmployeeController extends Controller
      
     public function index(Request $request)
 {
-    $query = $request->input('query');
     $perPageOptions = [10, 50, 100];
     $perPage = $request->input('per_page', 10);
-    $includeTrashed = $request->has('include_trashed');
 
-    $employeesQuery = Employee::query();
+    $query = Employee::query();
 
-    if ($includeTrashed) {
-        $employeesQuery->withTrashed();
+    if ($request->input('include_trashed') == 'on') {
+        $query->withTrashed();
     }
 
-    if ($query) {
-        $employeesQuery->where(function ($q) use ($query) {
-            $q->where('first_name', 'like', "%$query%")
-              ->orWhere('last_name', 'like', "%$query%")
-              ->orWhere('email', 'like', "%$query%")
-              ->orWhere('phone', 'like', "%$query%")
-              ->orWhereHas('company', function ($q) use ($query) {
-                  $q->where('name', 'like', "%$query%");
-              });
-        });
-    }
+    $employees = $query->paginate($perPage);
 
-    $employees = $employeesQuery->paginate($perPage);
-
-    return view('employees.index', compact('employees', 'perPageOptions', 'perPage', 'includeTrashed'));
+    return view('employees.index', compact('employees', 'perPageOptions', 'perPage'));
 }
 
 
@@ -115,29 +101,29 @@ class EmployeeController extends Controller
 
 
     public function search(Request $request)
-    {
-        $query = $request->input('query');
-        $perPageOptions = [10, 50, 100];
-        $perPage = $request->input('per_page', 10);
-        $includeTrashed = $request->input('include_trashed', false);
-    
-        $employees = Employee::query()
-            ->where(function ($q) use ($query) {
-                $q->where('first_name', 'like', "%$query%")
-                    ->orWhere('last_name', 'like', "%$query%")
-                    ->orWhere('email', 'like', "%$query%")
-                    ->orWhere('phone', 'like', "%$query%")
-                    ->orWhereHas('company', function($q) use ($query) {
-                        $q->where('name', 'like', "%$query%");
-                    });
-            })
-            ->when($includeTrashed, function ($q) {
-                return $q->withTrashed();
-            })
-            ->paginate($perPage);
-    
-        return view('employees.index', compact('employees', 'perPageOptions', 'perPage'));
+{
+    $query = $request->input('query');
+    $perPageOptions = [10, 50, 100];
+    $perPage = $request->input('per_page', 10);
+
+    $employeeQuery = Employee::query();
+
+    if ($request->input('include_trashed') == 'on') {
+        $employeeQuery->withTrashed();
     }
+
+    $employees = $employeeQuery->where(function ($q) use ($query) {
+        $q->where('first_name', 'like', "%$query%")
+          ->orWhere('last_name', 'like', "%$query%")
+          ->orWhere('email', 'like', "%$query%")
+          ->orWhere('phone', 'like', "%$query%")
+          ->orWhereHas('company', function ($q) use ($query) {
+              $q->where('name', 'like', "%$query%");
+          });
+    })->paginate($perPage);
+
+    return view('employees.index', compact('employees', 'perPageOptions', 'perPage'));
+}
     
     
 

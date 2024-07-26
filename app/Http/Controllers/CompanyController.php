@@ -18,14 +18,32 @@ class CompanyController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
-        $perPageOptions = [10, 50, 100];
+{
+    $perPageOptions = [10, 50, 100];
     $perPage = $request->input('per_page', 10);
 
-    $companies = Company::withTrashed()->paginate($perPage);
+    $query = Company::query();
+
+    if ($request->input('include_trashed') == 'on') {
+        $query->withTrashed();
+    }
+
+    if ($request->has('query')) {
+        $query->where(function ($subQuery) use ($request) {
+            $searchTerm = '%' . $request->input('query') . '%';
+            $subQuery->where('name', 'like', $searchTerm)
+                     ->orWhere('address', 'like', $searchTerm)
+                     ->orWhere('phone', 'like', $searchTerm)
+                     ->orWhere('email', 'like', $searchTerm)
+                     ->orWhere('website', 'like', $searchTerm);
+        });
+    }
+
+    $companies = $query->paginate($perPage);
 
     return view('companies.index', compact('companies', 'perPageOptions', 'perPage'));
-    }
+}
+
 
     /**
      * Show the form for creating a new resource.

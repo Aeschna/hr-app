@@ -13,26 +13,24 @@
                 <button class="btn btn-outline-secondary" type="submit"><i class="fas fa-search"></i></button>
             </div>
         </div>
-        <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="search_in_all" name="search_in_all" {{ request('search_in_all') == 'on' ? 'checked' : '' }}>
-            <label class="form-check-label" for="search_in_all">Search in all records (including deleted)</label>
-        </div>
     </form>
 
     <!-- Dropdown Button for Results Per Page -->
     <form id="resultsPerPageForm" action="{{ route('employees.index') }}" method="GET" class="form-inline mb-3">
         <label for="per_page" class="mr-2">Results per page: </label>
-        <select name="per_page" id="per_page" class="form-control" onchange="updateResultsPerPage()">
+        <select name="per_page" id="per_page" class="form-control" onchange="this.form.submit()">
             @foreach($perPageOptions as $option)
                 <option value="{{ $option }}" {{ $perPage == $option ? 'selected' : '' }}>{{ $option }}</option>
             @endforeach
         </select>
 
         <!-- Hidden Checkbox for Including Trashed Records -->
-        <input type="checkbox" id="include_trashed" name="include_trashed" style="display: none;" {{ request('include_trashed') == 'on' ? 'checked' : '' }}>
+        <div class="form-check ml-3" style="display: none;">
+            <input type="checkbox" class="form-check-input" id="include_trashed" name="include_trashed" {{ request('include_trashed') == 'on' ? 'checked' : '' }}>
+        </div>
 
         <!-- Button to Apply Include Deleted -->
-        <button type="button" id="includeDeletedButton" class="btn ml-3" onclick="toggleIncludeTrashed()">Include Deleted</button>
+        <button type="button" id="includeDeletedButton" class="btn {{ request('include_trashed') == 'on' ? 'btn-dark' : 'btn-secondary' }} ml-3" onclick="toggleIncludeTrashed()">Include Deleted</button>
     </form>
 
     @if (request()->has('query'))
@@ -104,54 +102,25 @@
 </div>
 
 <script>
-    var isIncludeTrashedActive = {{ request('include_trashed') == 'on' ? 'true' : 'false' }};
-
-    function updateResultsPerPage() {
-        var form = document.getElementById('resultsPerPageForm');
-        form.submit();
-    }
-
     function toggleIncludeTrashed() {
         var form = document.getElementById('resultsPerPageForm');
         var includeTrashedCheckbox = document.getElementById('include_trashed');
-        var button = document.getElementById('includeDeletedButton');
-
-        // Toggle checkbox state
+        var includeDeletedButton = document.getElementById('includeDeletedButton');
         includeTrashedCheckbox.checked = !includeTrashedCheckbox.checked;
-
-        // Change button color based on checkbox state
-        if (includeTrashedCheckbox.checked) {
-            button.classList.remove('btn-secondary');
-            button.classList.add('btn-dark');
-        } else {
-            button.classList.remove('btn-dark');
-            button.classList.add('btn-secondary');
-        }
-
-        // Submit the form
+        includeDeletedButton.classList.toggle('btn-dark');
+        includeDeletedButton.classList.toggle('btn-secondary');
         form.submit();
     }
-
-    // Initialize button color based on current checkbox state
-    document.addEventListener('DOMContentLoaded', function() {
-        var button = document.getElementById('includeDeletedButton');
-        if ({{ request('include_trashed') == 'on' ? 'true' : 'false' }}) {
-            button.classList.add('btn-dark');
-        } else {
-            button.classList.add('btn-secondary');
-        }
-    });
 
     document.getElementById('searchForm').onsubmit = function(event) {
         event.preventDefault();
         var query = this.query.value;
         var perPage = document.getElementById('per_page').value;
-        var searchInAll = document.getElementById('search_in_all').checked ? 'on' : 'off';
         var includeTrashed = document.getElementById('include_trashed').checked ? 'on' : 'off';
         var searchUrl = `http://127.0.0.1:8000/employees?per_page=${perPage}&query=${encodeURIComponent(query)}`;
 
         // Preserve the include_trashed state in the URL
-        if (searchInAll === 'on') {
+        if (includeTrashed === 'on') {
             searchUrl += `&include_trashed=on`;
         }
 
