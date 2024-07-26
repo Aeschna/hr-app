@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+
 <head>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 </head>
-
 <div class="container">
     <h2>Employees</h2>
     <a href="{{ route('employees.create') }}" class="btn btn-primary">Add Employee</a>
@@ -19,7 +19,7 @@
         </div>
     </form>
 
-    <!-- Dropdown Button for Results Per Page -->
+    <!-- Dropdown Button for Results Per Page and Include Deleted Button -->
     <form id="resultsPerPageForm" action="{{ route('employees.index') }}" method="GET" class="form-inline mb-3">
         <label for="per_page" class="mr-2">Results per page: </label>
         <select name="per_page" id="per_page" class="form-control" onchange="this.form.submit()">
@@ -44,11 +44,31 @@
     <table class="table table-bordered mt-3">
         <thead>
             <tr>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Company</th>
+                <th>
+                    <a href="{{ route('employees.index', array_merge(request()->all(), ['sort' => 'first_name', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}">
+                        First Name
+                    </a>
+                </th>
+                <th>
+                    <a href="{{ route('employees.index', array_merge(request()->all(), ['sort' => 'last_name', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}">
+                        Last Name
+                    </a>
+                </th>
+                <th>
+                    <a href="{{ route('employees.index', array_merge(request()->all(), ['sort' => 'email', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}">
+                        Email
+                    </a>
+                </th>
+                <th>
+                    <a href="{{ route('employees.index', array_merge(request()->all(), ['sort' => 'phone', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}">
+                        Phone
+                    </a>
+                </th>
+                <th>
+                    <a href="{{ route('employees.index', array_merge(request()->all(), ['sort' => 'company', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}">
+                        Company
+                    </a>
+                </th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -59,7 +79,7 @@
                 <td>{{ $employee->last_name }}</td>
                 <td>{{ $employee->email }}</td>
                 <td>{{ $employee->phone }}</td>
-                <td>{{ $employee->company->name }}</td>
+                <td>{{ $employee->company->name ?? 'N/A' }}</td>
                 <td>
                     @if($employee->trashed())
                         <form action="{{ route('employees.restore', $employee->id) }}" method="POST" style="display:inline;">
@@ -68,8 +88,7 @@
                             <button type="submit" class="btn btn-success">Restore</button>
                         </form>
                     @else
-                    <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-info">Edit</a>
-                    
+                        <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-info">Edit</a>
                         <form action="{{ route('employees.destroy', $employee->id) }}" method="POST" style="display:inline;">
                             @csrf
                             @method('DELETE')
@@ -122,7 +141,7 @@
         var query = this.query.value;
         var perPage = document.getElementById('per_page').value;
         var includeTrashed = document.getElementById('include_trashed').checked ? 'on' : 'off';
-        var searchUrl = `http://127.0.0.1:8000/employees?per_page=${perPage}&query=${encodeURIComponent(query)}`;
+        var searchUrl = `{{ route('employees.index') }}?per_page=${perPage}&query=${encodeURIComponent(query)}`;
 
         // Preserve the include_trashed state in the URL
         if (includeTrashed === 'on') {
@@ -132,4 +151,5 @@
         window.location.href = searchUrl;
     };
 </script>
+
 @endsection

@@ -39,9 +39,14 @@ class CompanyController extends Controller
         });
     }
 
+    // Sıralama
+    $sort = $request->input('sort', 'name');
+    $direction = $request->input('direction', 'asc');
+    $query->orderBy($sort, $direction);
+
     $companies = $query->paginate($perPage);
 
-    return view('companies.index', compact('companies', 'perPageOptions', 'perPage'));
+    return view('companies.index', compact('companies', 'perPageOptions', 'perPage', 'sort', 'direction'));
 }
 
 

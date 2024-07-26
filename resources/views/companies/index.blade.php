@@ -44,10 +44,10 @@
     <table class="table table-bordered mt-3">
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Logo</th>
-                <th>Website</th>
+                <th><a href="{{ route('companies.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'name', 'direction' => $sort === 'name' && $direction === 'asc' ? 'desc' : 'asc'])) }}">Name</a></th>
+                <th><a href="{{ route('companies.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'email', 'direction' => $sort === 'email' && $direction === 'asc' ? 'desc' : 'asc'])) }}">Email</a></th>
+                <th><a href="{{ route('companies.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'logo', 'direction' => $sort === 'logo' && $direction === 'asc' ? 'desc' : 'asc'])) }}">Logo</a></th>
+                <th><a href="{{ route('companies.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'website', 'direction' => $sort === 'website' && $direction === 'asc' ? 'desc' : 'asc'])) }}">Website</a></th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -119,20 +119,5 @@
         includeDeletedButton.classList.toggle('btn-secondary');
         form.submit();
     }
-
-    document.getElementById('searchForm').onsubmit = function(event) {
-        event.preventDefault();
-        var query = this.query.value;
-        var perPage = document.getElementById('per_page').value;
-        var includeTrashed = document.getElementById('include_trashed').checked ? 'on' : 'off';
-        var searchUrl = `http://127.0.0.1:8000/companies?per_page=${perPage}&query=${encodeURIComponent(query)}`;
-
-        // Preserve the include_trashed state in the URL
-        if (includeTrashed === 'on') {
-            searchUrl += `&include_trashed=on`;
-        }
-
-        window.location.href = searchUrl;
-    };
 </script>
 @endsection

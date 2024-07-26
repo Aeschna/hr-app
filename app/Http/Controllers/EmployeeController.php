@@ -15,33 +15,48 @@ class EmployeeController extends Controller
     }
 
     public function index(Request $request)
-    {
-        $perPageOptions = [10, 50, 100];
-        $perPage = $request->input('per_page', 10);
+{
+    $perPageOptions = [10, 50, 100];
+    $perPage = $request->input('per_page', 10);
 
-        $query = Employee::query();
+    $query = Employee::query();
 
-        if ($request->input('include_trashed') == 'on') {
-            $query->withTrashed();
-        }
-
-        if ($request->has('query')) {
-            $query->where(function ($subQuery) use ($request) {
-                $searchTerm = '%' . $request->input('query') . '%';
-                $subQuery->where('first_name', 'like', $searchTerm)
-                         ->orWhere('last_name', 'like', $searchTerm)
-                         ->orWhere('email', 'like', $searchTerm)
-                         ->orWhere('phone', 'like', $searchTerm)
-                         ->orWhereHas('company', function ($q) use ($searchTerm) {
-                             $q->where('name', 'like', $searchTerm);
-                         });
-            });
-        }
-
-        $employees = $query->paginate($perPage);
-
-        return view('employees.index', compact('employees', 'perPageOptions', 'perPage'));
+    if ($request->input('include_trashed') == 'on') {
+        $query->withTrashed();
     }
+
+    if ($request->has('query')) {
+        $query->where(function ($subQuery) use ($request) {
+            $searchTerm = '%' . $request->input('query') . '%';
+            $subQuery->where('first_name', 'like', $searchTerm)
+                     ->orWhere('last_name', 'like', $searchTerm)
+                     ->orWhere('email', 'like', $searchTerm)
+                     ->orWhere('phone', 'like', $searchTerm)
+                     ->orWhereHas('company', function ($q) use ($searchTerm) {
+                         $q->where('name', 'like', $searchTerm);
+                     });
+        });
+    }
+
+    // Sıralama
+    $sort = $request->input('sort', 'first_name'); // Varsayılan sıralama sütunu
+    $direction = $request->input('direction', 'asc'); // Varsayılan sıralama yönü
+
+    if ($sort === 'company') {
+        $query->join('companies', 'employees.company_id', '=', 'companies.id')
+              ->orderBy('companies.name', $direction)
+              ->select('employees.*');
+    } else {
+        $query->orderBy($sort, $direction);
+    }
+
+    $employees = $query->paginate($perPage);
+
+    return view('employees.index', compact('employees', 'perPageOptions', 'perPage', 'sort', 'direction'));
+}
+
+
+    
 
     public function create()
     {
