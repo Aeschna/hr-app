@@ -12,124 +12,83 @@ class EmployeeController extends Controller
     public function __construct()
     {
         $this->middleware('auth'); // Require authentication for all methods
-    }  
-     
-    public function index(Request $request)
-{
-    $perPageOptions = [10, 50, 100];
-    $perPage = $request->input('per_page', 10);
-
-    $query = Employee::query();
-
-    if ($request->input('include_trashed') == 'on') {
-        $query->withTrashed();
     }
 
-    $employees = $query->paginate($perPage);
+    public function index(Request $request)
+    {
+        $perPageOptions = [10, 50, 100];
+        $perPage = $request->input('per_page', 10);
 
-    return view('employees.index', compact('employees', 'perPageOptions', 'perPage'));
-}
+        $query = Employee::query();
 
+        if ($request->input('include_trashed') == 'on') {
+            $query->withTrashed();
+        }
 
+        if ($request->has('query')) {
+            $query->where(function ($subQuery) use ($request) {
+                $searchTerm = '%' . $request->input('query') . '%';
+                $subQuery->where('first_name', 'like', $searchTerm)
+                         ->orWhere('last_name', 'like', $searchTerm)
+                         ->orWhere('email', 'like', $searchTerm)
+                         ->orWhere('phone', 'like', $searchTerm)
+                         ->orWhereHas('company', function ($q) use ($searchTerm) {
+                             $q->where('name', 'like', $searchTerm);
+                         });
+            });
+        }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+        $employees = $query->paginate($perPage);
+
+        return view('employees.index', compact('employees', 'perPageOptions', 'perPage'));
+    }
+
     public function create()
     {
         $companies = Company::all();
         return view('employees.create', compact('companies'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(EmployeeRequest $request)
     {
         $validatedData = $request->validated();
-
         Employee::create($validatedData);
+
         return redirect()->route('employees.index')->with('success', 'Employee created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Employee $employee)
     {
         return view('employees.show', compact('employee'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Employee $employee)
     {
         $companies = Company::all();
         return view('employees.edit', compact('employee', 'companies'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(EmployeeRequest $request, Employee $employee)
     {
         $validatedData = $request->validated();
-
         $employee->update($validatedData);
+
         return redirect()->route('employees.index')->with('success', 'Employee updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy( $id)
+    public function destroy($id)
     {
-        
         $employee = Employee::findOrFail($id);
         $employee->delete();
+
         return redirect()->route('employees.index')->with('success', 'Employee deleted successfully.');
     }
+
     public function restore($id)
     {
         $employee = Employee::withTrashed()->findOrFail($id);
         $employee->restore();
-    
-        return redirect()->route('employees.index')->with('success', 'Çalışan başarıyla geri yüklendi.');
+
+        return redirect()->route('employees.index')->with('success', 'Employee restored successfully.');
     }
-    
-
-
-    public function search(Request $request)
-{
-    $query = $request->input('query');
-    $perPageOptions = [10, 50, 100];
-    $perPage = $request->input('per_page', 10);
-
-    $employeeQuery = Employee::query();
-
-    if ($request->input('include_trashed') == 'on') {
-        $employeeQuery->withTrashed();
-    }
-
-    $employees = $employeeQuery->where(function ($q) use ($query) {
-        $q->where('first_name', 'like', "%$query%")
-          ->orWhere('last_name', 'like', "%$query%")
-          ->orWhere('email', 'like', "%$query%")
-          ->orWhere('phone', 'like', "%$query%")
-          ->orWhereHas('company', function ($q) use ($query) {
-              $q->where('name', 'like', "%$query%");
-          });
-    })->paginate($perPage);
-
-    return view('employees.index', compact('employees', 'perPageOptions', 'perPage'));
-}
-    
-    
-
-
-
- 
-
-    
 }

@@ -1,34 +1,15 @@
 @import '~bootstrap/dist/css/bootstrap.min.css';
 
-/* Pagination genel stili */
-.pagination {
-    justify-content: center; /* Orta hizalama */
-    margin-top: 20px; /* Üst boşluk */
+.actions-column {
+    white-space: nowrap;
 }
 
-.pagination .page-item {
-    margin: 0 2px; /* Her iki tarafta küçük boşluk */
+.actions-column form,
+.actions-column a {
+    display: inline-block;
+    margin-right: 5px;
 }
 
-.pagination .page-link {
-    padding: 0.25rem 0.5rem; /* Küçük padding */
-    font-size: 0.875rem; /* Küçük yazı boyutu */
-    height: auto; /* Yüksekliği otomatik */
-    border-radius: 0.25rem; /* Köşe yuvarlama */
-}
-
-.pagination .page-link svg {
-    width: 1rem; /* SVG ikon genişliği */
-    height: 1rem; /* SVG ikon yüksekliği */
-}
-
-.pagination .page-item.active .page-link {
-    background-color: #007bff; /* Aktif sayfa arka plan rengi */
-    border-color: #007bff; /* Aktif sayfa kenar rengi */
-    color: #fff; /* Aktif sayfa yazı rengi */
-}
-
-.pagination .page-item.disabled .page-link {
-    color: #6c757d; /* Devam etmeyen sayfa rengi */
-    pointer-events: none; /* Tıklanamaz hale getirme */
+.actions-column button {
+    margin-right: 5px;
 }

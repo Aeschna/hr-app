@@ -46,5 +46,6 @@ Auth::routes(['register' => false]);
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
 //Soft Delete Restore routes
-Route::post('/companies/{company}/restore', [CompanyController::class, 'restore'])->name('companies.restore');
+Route::put('companies/{id}/restore', [CompanyController::class, 'restore'])->name('companies.restore');
+
 Route::put('employees/{id}/restore', [EmployeeController::class, 'restore'])->name('employees.restore');

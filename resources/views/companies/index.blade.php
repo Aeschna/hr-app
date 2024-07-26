@@ -1,6 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+
+<head>
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+</head>
 <div class="container">
     <h2>Companies</h2>
     <a href="{{ route('companies.create') }}" class="btn btn-primary">Add Company</a>
@@ -68,7 +72,7 @@
                             <button type="submit" class="btn btn-success">Restore</button>
                         </form>
                     @else
-                        <a href="{{ route('companies.edit', $company->id) }}" class="btn btn-warning">Edit</a>
+                        <a href="{{ route('companies.edit', $company->id) }}" class="btn btn-info">Edit</a>
                         <form action="{{ route('companies.destroy', $company->id) }}" method="POST" style="display:inline;">
                             @csrf
                             @method('DELETE')
