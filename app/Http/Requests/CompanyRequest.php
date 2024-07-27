@@ -23,11 +23,11 @@ class CompanyRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'address' => 'required|string|max:255',
-            'phone' => 'required|string|max:15',
-            'email' => 'required|email|max:255|unique:companies,email,' . $this->route('company'),
+            'address' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:15',
+            'email' => 'nullable|email|max:255|unique:companies,email,' . $this->route('company'),
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|dimensions:min_width=100,min_height=100',
-            'website' => 'required|url|max:255',
+            'website' => 'nullable|url|max:255',
         ];
     }
 }

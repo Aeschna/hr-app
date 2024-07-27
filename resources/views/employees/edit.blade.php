@@ -8,11 +8,11 @@
         @method('PUT')
         <div class="form-group">
             <label for="first_name">First Name</label>
-            <input type="text" name="first_name" class="form-control" id="first_name" value="{{ $employee->first_name }}" required>
+            <input type="text" name="first_name" class="form-control" id="first_name" value="{{ $employee->first_name }}" >
         </div>
         <div class="form-group">
             <label for="last_name">Last Name</label>
-            <input type="text" name="last_name" class="form-control" id="last_name" value="{{ $employee->last_name }}" required>
+            <input type="text" name="last_name" class="form-control" id="last_name" value="{{ $employee->last_name }}" >
         </div>
         <div class="form-group">
             <label for="email">Email</label>
@@ -20,7 +20,7 @@
         </div>
         <div class="form-group">
             <label for="phone">Phone</label>
-            <input type="text" name="phone" class="form-control" id="phone" value="{{ $employee->phone }}" required>
+            <input type="text" name="phone" class="form-control" id="phone" value="{{ $employee->phone }}" >
         </div>
         <div class="form-group">
             <label for="company_id">Company</label>

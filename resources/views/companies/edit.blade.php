@@ -21,19 +21,19 @@
         @method('PUT')
         <div class="form-group">
             <label for="name">Name</label>
-            <input type="text" class="form-control" id="name" name="name" value="{{ $company->name }}" required>
+            <input type="text" class="form-control" id="name" name="name" value="{{ $company->name }}" >
         </div>
         <div class="form-group">
             <label for="address">Address</label>
-            <input type="text" class="form-control" id="address" name="address" value="{{ $company->address }}" required>
+            <input type="text" class="form-control" id="address" name="address" value="{{ $company->address }}" >
         </div>
         <div class="form-group">
             <label for="phone">Phone</label>
-            <input type="text" class="form-control" id="phone" name="phone" value="{{ $company->phone }}" required>
+            <input type="text" class="form-control" id="phone" name="phone" value="{{ $company->phone }}" >
         </div>
         <div class="form-group">
             <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" name="email" value="{{ $company->email }}" required>
+            <input type="email" class="form-control" id="email" name="email" value="{{ $company->email }}" >
         </div>
         <div class="form-group">
         <label for="logo">Logo</label>
@@ -44,7 +44,7 @@
         </div>
         <div class="form-group">
             <label for="website">Website</label>
-            <input type="text" class="form-control" id="website" name="website" value="{{ $company->website }}" required>
+            <input type="text" class="form-control" id="website" name="website" value="{{ $company->website }}">
         </div>
         <button type="submit" class="btn btn-primary">Update</button>
     </form>

@@ -6,11 +6,11 @@
     <form action="{{ route('employees.store') }}" method="POST">
         @csrf
         <div class="form-group">
-            <label for="first_name">First Name</label>
+            <label for="first_name">First Name <span class="text-danger">*</span></label>
             <input type="text" name="first_name" class="form-control" id="first_name" required>
         </div>
         <div class="form-group">
-            <label for="last_name">Last Name</label>
+            <label for="last_name">Last Name <span class="text-danger">*</span></label>
             <input type="text" name="last_name" class="form-control" id="last_name" required>
         </div>
         <div class="form-group">
@@ -18,7 +18,7 @@
             <input type="email" name="email" class="form-control" id="email">
         </div>
         <div class="form-group">
-            <label for="phone">Phone</label>
+            <label for="phone">Phone <span class="text-danger">*</span></label>
             <input type="text" name="phone" class="form-control" id="phone" required>
         </div>
         <div class="form-group">
