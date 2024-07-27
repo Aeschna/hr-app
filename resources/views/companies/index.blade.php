@@ -119,5 +119,21 @@
         includeDeletedButton.classList.toggle('btn-secondary');
         form.submit();
     }
+
+    document.getElementById('searchForm').onsubmit = function(event) {
+        event.preventDefault();
+        var query = this.query.value;
+        var perPage = document.getElementById('per_page').value;
+        var includeTrashed = document.getElementById('include_trashed').checked ? 'on' : 'off';
+        var searchUrl = `{{ route('companies.index') }}?per_page=${perPage}&query=${encodeURIComponent(query)}`;
+
+        // Preserve the include_trashed state in the URL
+        if (includeTrashed === 'on') {
+            searchUrl += `&include_trashed=on`;
+        }
+
+        window.location.href = searchUrl;
+    };
 </script>
+
 @endsection

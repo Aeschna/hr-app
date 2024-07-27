@@ -89,7 +89,7 @@
                         </form>
                     @else
                         <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-info">Edit</a>
-                        <form action="{{ route('employees.destroy', $employee->id) }}" method="POST" style="display:inline;">
+                        <form action="{{ route('employees.destroy', $employee->id) }}" method="POST" style="display:inline;" onsubmit="return confirmDelete()">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger">Delete</button>
@@ -150,6 +150,10 @@
 
         window.location.href = searchUrl;
     };
+
+    function confirmDelete() {
+        return confirm('Are you sure you want to delete this employee?');
+    }
 </script>
 
 @endsection
