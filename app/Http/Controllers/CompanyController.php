@@ -126,16 +126,35 @@ class CompanyController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Company $company)
-    {
-        if ($company->logo) {
-            Storage::delete('public/' . $company->logo);
-        }
+    public function destroy($id)
+{
+    $company = Company::withTrashed()->findOrFail($id);
 
+    if ($company->trashed()) {
+        $company->forceDelete();
+        session()->flash('status', 'Company permanently deleted!');
+    } else {
         $company->delete();
-
-        return redirect()->route('companies.index')->with('success', 'Company deleted successfully.');
+        session()->flash('status', 'Company deleted!');
     }
+
+    return redirect()->route('companies.index');
+}
+
+    public function forceDelete($id)
+{
+    $company = Company::withTrashed()->findOrFail($id);
+
+    if ($company->trashed()) {
+        $company->forceDelete();
+        session()->flash('status', 'Company permanently deleted!');
+    } else {
+        session()->flash('status', 'Company is not deleted yet, soft delete the employee first!');
+    }
+
+    return redirect()->route('companies.index');
+}
+
 
     public function restore($id)
     {

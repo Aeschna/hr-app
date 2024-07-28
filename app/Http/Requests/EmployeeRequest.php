@@ -27,4 +27,10 @@ class EmployeeRequest extends FormRequest
             'company_id' => 'required|exists:companies,id',
         ];
     }
+    public function messages(): array
+    {
+        return [
+            'phone.regex' => 'Please enter a valid phone number',
+        ];
+    }
 }

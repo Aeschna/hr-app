@@ -19,7 +19,11 @@
         </div>
         <div class="form-group">
             <label for="phone">Phone <span class="text-danger">*</span></label>
-            <input type="text" name="phone" class="form-control" id="phone" required>
+            <input type="text" name="phone" class="form-control" id="phone" 
+            pattern="^\+?[0-9\s\-\(\)]+$"
+
+                   title="Please enter a valid phone number." 
+                   required>
         </div>
         <div class="form-group">
             <label for="company_id">Company</label>
@@ -33,4 +37,3 @@
     </form>
 </div>
 @endsection
-

@@ -49,3 +49,7 @@ Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 Route::put('companies/{id}/restore', [CompanyController::class, 'restore'])->name('companies.restore');
 
 Route::put('employees/{id}/restore', [EmployeeController::class, 'restore'])->name('employees.restore');
+
+//Force delete
+Route::delete('/employees/{id}/force-delete', [EmployeeController::class, 'forceDelete'])->name('employees.forceDelete');
+Route::delete('/companies/{id}/force-delete', [CompanyController::class, 'forceDelete'])->name('companies.forceDelete');

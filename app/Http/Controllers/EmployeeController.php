@@ -88,22 +88,46 @@ class EmployeeController extends Controller
         $validatedData = $request->validated();
         $employee->update($validatedData);
 
-        return redirect()->route('employees.index')->with('success', 'Employee updated successfully.');
+        return redirect()->route('employees.index')->with('status', 'Employee updated successfully.');
     }
 
     public function destroy($id)
-    {
-        $employee = Employee::findOrFail($id);
-        $employee->delete();
+{
+    $employee = Employee::withTrashed()->findOrFail($id);
 
-        return redirect()->route('employees.index')->with('success', 'Employee deleted successfully.');
+    if ($employee->trashed()) {
+        $employee->forceDelete();
+        session()->flash('status', 'Employee permanently deleted!');
+    } else {
+        $employee->delete();
+        session()->flash('status', 'Employee deleted!');
     }
+
+    return redirect()->route('employees.index');
+}
+
+
+    public function forceDelete($id)
+    {
+        $employee = Employee::withTrashed()->findOrFail($id);
+    
+        if ($employee->trashed()) {
+            $employee->forceDelete();
+            session()->flash('status', 'Employee permanently deleted!');
+        } else {
+            session()->flash('status', 'Employee is not deleted yet, soft delete the employee first!');
+        }
+    
+        return redirect()->route('employees.index');
+    }
+    
+
 
     public function restore($id)
     {
         $employee = Employee::withTrashed()->findOrFail($id);
         $employee->restore();
 
-        return redirect()->route('employees.index')->with('success', 'Employee restored successfully.');
+        return redirect()->route('employees.index')->with('status', 'Employee restored successfully.');
     }
 }

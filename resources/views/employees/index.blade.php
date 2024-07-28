@@ -3,11 +3,15 @@
 @section('content')
 
 <head>
+
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 </head>
 <div class="container">
     <h2>Employees</h2>
     <a href="{{ route('employees.create') }}" class="btn btn-primary">Add Employee</a>
+
+   
+
 
     <!-- Search Form -->
     <form id="searchForm" method="GET" class="mt-3">
@@ -87,6 +91,11 @@
                             @method('PUT')
                             <button type="submit" class="btn btn-success">Restore</button>
                         </form>
+                        <form action="{{ route('employees.forceDelete', $employee->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to permanently delete this employee?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger">Force Delete</button>
+                </form>
                     @else
                         <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-info">Edit</a>
                         <form action="{{ route('employees.destroy', $employee->id) }}" method="POST" style="display:inline;" onsubmit="return confirmDelete()">
