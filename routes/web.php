@@ -21,17 +21,18 @@ Route::group(['middleware' => ['auth']], function() {
     
 
    
-
-
-    Route::resource('companies', CompanyController::class);
-    Route::resource('employees', EmployeeController::class);
-    Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
+   
     
 
 
     // Admin-only routes (ensure admin middleware is properly defined)
     Route::group(['middleware' => ['admin']], function() {
     
+        Route::resource('companies', CompanyController::class);
+        Route::resource('employees', EmployeeController::class);
+        Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
+
+
     });
 
     // Allow employees to view companies and employees but not modify
