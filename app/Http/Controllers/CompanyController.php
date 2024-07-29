@@ -12,59 +12,58 @@ class CompanyController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-
     }
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index(Request $request)
-{
-    $perPageOptions = [10, 50, 100];
-    $perPage = $request->input('per_page', 10);
+    {
+        // Breadcrumb verileri
+        $breadcrumbs = [
+            ['name' => 'Home', 'url' => route('home')],
+            ['name' => 'Companies', 'url' => route('companies.index')],
+        ];
 
-    $query = Company::query();
+        $perPageOptions = [10, 50, 100];
+        $perPage = $request->input('per_page', 10);
+        $query = Company::query();
 
-    if ($request->input('include_trashed') == 'on') {
-        $query->withTrashed();
+        if ($request->input('include_trashed') == 'on') {
+            $query->withTrashed();
+        }
+
+        if ($request->has('query')) {
+            $query->where(function ($subQuery) use ($request) {
+                $searchTerm = '%' . $request->input('query') . '%';
+                $subQuery->where('name', 'like', $searchTerm)
+                         ->orWhere('address', 'like', $searchTerm)
+                         ->orWhere('phone', 'like', $searchTerm)
+                         ->orWhere('email', 'like', $searchTerm)
+                         ->orWhere('website', 'like', $searchTerm);
+            });
+        }
+
+        $sort = $request->input('sort', 'name');
+        $direction = $request->input('direction', 'asc');
+        $query->orderBy($sort, $direction);
+
+        $companies = $query->paginate($perPage);
+
+        return view('companies.index', compact('companies', 'perPageOptions', 'perPage', 'sort', 'direction', 'breadcrumbs'));
     }
 
-    if ($request->has('query')) {
-        $query->where(function ($subQuery) use ($request) {
-            $searchTerm = '%' . $request->input('query') . '%';
-            $subQuery->where('name', 'like', $searchTerm)
-                     ->orWhere('address', 'like', $searchTerm)
-                     ->orWhere('phone', 'like', $searchTerm)
-                     ->orWhere('email', 'like', $searchTerm)
-                     ->orWhere('website', 'like', $searchTerm);
-        });
-    }
-
-    // Sıralama
-    $sort = $request->input('sort', 'name');
-    $direction = $request->input('direction', 'asc');
-    $query->orderBy($sort, $direction);
-
-    $companies = $query->paginate($perPage);
-
-    return view('companies.index', compact('companies', 'perPageOptions', 'perPage', 'sort', 'direction'));
-}
-
-
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        return view('companies.create');
+        $breadcrumbs = [
+            ['name' => 'Home', 'url' => route('home'), 'active' => false],
+            ['name' => 'Companies', 'url' => route('companies.index'), 'active' => false],
+            ['name' => 'Create', 'url' => '', 'active' => true],
+        ];
+
+        return view('companies.create', compact('breadcrumbs'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(CompanyRequest $request)
     {
         $validatedData = $request->validated();
-
         $company = new Company();
         $company->name = $validatedData['name'];
         $company->address = $validatedData['address'];
@@ -81,80 +80,102 @@ class CompanyController extends Controller
         $company->website = $validatedData['website'];
         $company->save();
 
-        return redirect()->route('companies.index')->with('success', 'Company created successfully.');
+        return redirect()->route('companies.index')->with('status', 'Company created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Company $company)
     {
-        return view('companies.show', compact('company'));
+        $breadcrumbs = [
+            ['name' => 'Home', 'url' => route('home')],
+            ['name' => 'Companies', 'url' => route('companies.index')],
+            ['name' => 'Show', 'url' => '#'],
+        ];
+
+        return view('companies.show', compact('company', 'breadcrumbs'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Company $company)
     {
-        return view('companies.edit', compact('company'));
+        $breadcrumbs = [
+            ['name' => 'Home', 'url' => route('home'), 'active' => false],
+            ['name' => 'Companies', 'url' => route('companies.index'), 'active' => false],
+            ['name' => 'Edit', 'url' => '', 'active' => true],
+        ];
+
+        return view('companies.edit', compact('breadcrumbs', 'company'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(CompanyRequest $request, Company $company)
+    public function update(Request $request, $id)
     {
-        $validatedData = $request->validated();
-
+        // Veritabanı doğrulama kuralları
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'address' => 'nullable|string',
+            'phone' => 'nullable|string|max:20',
+            'email' => 'nullable|email',
+            'website' => 'nullable|url',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+    
+        // Şirketi bul
+        $company = Company::findOrFail($id);
+    
+        // Eğer logo dosyası varsa, eski logoyu sil ve yeni logoyu yükle
         if ($request->hasFile('logo')) {
             if ($company->logo) {
                 Storage::delete('public/' . $company->logo);
             }
-
+    
             $logo = $request->file('logo');
             $logoName = time() . '.' . $logo->getClientOriginalExtension();
             $logo->storeAs('public/logos', $logoName);
-            $validatedData['logo'] = 'logos/' . $logoName;
+            $logoPath = 'logos/' . $logoName;
+        } else {
+            $logoPath = $company->logo;
+        }
+    
+        // Şirketi güncelle
+        $company->update([
+            'name' => $request->input('name'),
+            'address' => $request->input('address'),
+            'phone' => $request->input('phone'),
+            'email' => $request->input('email'),
+            'website' => $request->input('website'),
+            'logo' => $logoPath,
+        ]);
+    
+        return redirect()->route('companies.index')->with('status', 'Company updated successfully!');
+    }
+    
+
+    public function destroy($id)
+    {
+        $company = Company::withTrashed()->findOrFail($id);
+
+        if ($company->trashed()) {
+            $company->forceDelete();
+            session()->flash('status', 'Company permanently deleted!');
+        } else {
+            $company->delete();
+            session()->flash('status', 'Company deleted!');
         }
 
-        $company->update($validatedData);
-
-        return redirect()->route('companies.index')->with('success', 'Company updated successfully.');
+        return redirect()->route('companies.index');
     }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
-{
-    $company = Company::withTrashed()->findOrFail($id);
-
-    if ($company->trashed()) {
-        $company->forceDelete();
-        session()->flash('status', 'Company permanently deleted!');
-    } else {
-        $company->delete();
-        session()->flash('status', 'Company deleted!');
-    }
-
-    return redirect()->route('companies.index');
-}
 
     public function forceDelete($id)
-{
-    $company = Company::withTrashed()->findOrFail($id);
+    {
+        $company = Company::withTrashed()->findOrFail($id);
 
-    if ($company->trashed()) {
-        $company->forceDelete();
-        session()->flash('status', 'Company permanently deleted!');
-    } else {
-        session()->flash('status', 'Company is not deleted yet, soft delete the employee first!');
+        if ($company->trashed()) {
+            $company->forceDelete();
+            session()->flash('status', 'Company permanently deleted!');
+        } else {
+            session()->flash('status', 'Company is not deleted yet, soft delete the company first!');
+        }
+
+        return redirect()->route('companies.index');
     }
-
-    return redirect()->route('companies.index');
-}
-
 
     public function restore($id)
     {
@@ -162,28 +183,25 @@ class CompanyController extends Controller
 
         if ($company && $company->trashed()) {
             $company->restore();
-            return redirect()->route('companies.index')->with('success', 'Company restored successfully.');
+            return redirect()->route('companies.index')->with('status', 'Company restored successfully.');
         }
 
-        return redirect()->route('companies.index')->with('error', 'Company not found or not deleted.');
+        return redirect()->route('companies.index')->with('status', 'Company not found or not deleted.');
     }
 
     public function search(Request $request)
-{
-    $query = $request->input('query');
-    $perPageOptions = [10, 50, 100];
-    $perPage = $request->input('per_page', 10);
+    {
+        $query = $request->input('query');
+        $perPageOptions = [10, 50, 100];
+        $perPage = $request->input('per_page', 10);
 
-    $companies = Company::where('name', 'like', "%$query%")
-        ->orWhere('address', 'like', "%$query%")
-        ->orWhere('phone', 'like', "%$query%")
-        ->orWhere('email', 'like', "%$query%")
-        ->orWhere('website', 'like', "%$query%" )->paginate($perPage);
-         
-         return view('companies.index', compact('companies', 'perPageOptions', 'perPage'));
-    
-}
-    
+        $companies = Company::where('name', 'like', "%$query%")
+            ->orWhere('address', 'like', "%$query%")
+            ->orWhere('phone', 'like', "%$query%")
+            ->orWhere('email', 'like', "%$query%")
+            ->orWhere('website', 'like', "%$query%")
+            ->paginate($perPage);
 
-    
+        return view('companies.index', compact('companies', 'perPageOptions', 'perPage'));
+    }
 }

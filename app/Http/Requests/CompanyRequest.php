@@ -24,7 +24,7 @@ class CompanyRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'address' => 'nullable|string|max:255',
-            'phone' => 'nullable|string|max:15',
+            'phone' => 'required|string|max:15|regex:/^[0-9+\(\)#\.\s\/ext-]+$/',
             'email' => 'nullable|email|max:255|unique:companies,email,' . $this->route('company'),
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|dimensions:min_width=100,min_height=100',
             'website' => 'nullable|url|max:255',

@@ -48,10 +48,34 @@
         </div>
     </nav>
 
-
-    
-
     <div class="container mt-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                @if (request()->routeIs('companies.*'))
+                    <li class="breadcrumb-item"><a href="{{ route('companies.index') }}">Companies</a></li>
+                    @if (request()->routeIs('companies.create'))
+                        <li class="breadcrumb-item active" aria-current="page">Create</li>
+                    @elseif (request()->routeIs('companies.edit'))
+                        <li class="breadcrumb-item active" aria-current="page">Edit</li>
+                    @elseif (request()->routeIs('companies.show'))
+                        <li class="breadcrumb-item active" aria-current="page">Details</li>
+                    @endif
+                @elseif (request()->routeIs('employees.*'))
+                    <li class="breadcrumb-item"><a href="{{ route('employees.index') }}">Employees</a></li>
+                    @if (request()->routeIs('employees.create'))
+                        <li class="breadcrumb-item active" aria-current="page">Create</li>
+                    @elseif (request()->routeIs('employees.edit'))
+                        <li class="breadcrumb-item active" aria-current="page">Edit</li>
+                    @elseif (request()->routeIs('employees.show'))
+                        <li class="breadcrumb-item active" aria-current="page">Details</li>
+                    @endif
+                @endif
+                <!-- Additional breadcrumb items can be added as needed -->
+            </ol>
+        </nav>
+
         <!-- Notification message -->
         @if (session('status'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
