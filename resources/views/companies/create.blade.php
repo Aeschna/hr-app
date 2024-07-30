@@ -5,20 +5,20 @@
         <h2>Create Company</h2>
 
         <!-- Validation Errors -->
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-    
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <form action="{{ route('companies.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="form-group">
-            <label for="name">Name: <span class="text-danger">*</span></label>
+                <label for="name">Name: <span class="text-danger">*</span></label>
                 <input type="text" class="form-control" id="name" name="name" required>
             </div>
             <div class="form-group">
@@ -41,6 +41,18 @@
                 <label for="website">Website:</label>
                 <input type="text" class="form-control" id="website" name="website" >
             </div>
+
+            <!-- User selection -->
+            <div class="form-group">
+                <label for="user_id">Select User: <span class="text-danger">*</span></label>
+                <select name="user_id" id="user_id" class="form-control">
+                    <option value="">Select a user</option>
+                    @foreach($users as $user)
+                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
             <button type="submit" class="btn btn-primary">Save</button>
         </form>
     </div>

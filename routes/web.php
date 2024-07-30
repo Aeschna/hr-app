@@ -35,9 +35,16 @@ Route::group(['middleware' => ['auth']], function() {
 
     });
 
-    // Allow employees to view companies and employees but not modify
+    // User only routes
+Route::group(['middleware' => ['auth']], function() {
     Route::resource('companies', CompanyController::class)->only(['index', 'show']);
     Route::resource('employees', EmployeeController::class)->only(['index', 'show']);
+    Route::resource('companies/create', CompanyController::class)->only(['index', 'show']);
+});
+
+    
+  
+  
 });
 
 // Authentication routes

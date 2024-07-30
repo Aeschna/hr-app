@@ -4,25 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HR App</title>
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <!-- Place additional stylesheets or scripts here -->
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="{{ url('/') }}">HR App</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
+    <a class="navbar-brand" href="{{ url('/') }}" style="font-size: 1.5rem;">
+    <img src="{{ asset('storage/logos/Hr App.png') }}" style="height: 40px;">
 
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+
+
+
+        
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 @auth
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('companies.index') }}">Companies</a>
-                    </li>
+                    @if(auth()->user()->is_admin || (auth()->user()->company_id == request()->route('company')))
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('companies.index') }}">Companies</a>
+                        </li>
+                    @endif
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('employees.index') }}">Employees</a>
                     </li>

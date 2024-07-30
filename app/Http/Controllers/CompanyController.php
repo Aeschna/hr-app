@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CompanyRequest;
 use App\Models\Company;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -57,31 +58,47 @@ class CompanyController extends Controller
             ['name' => 'Companies', 'url' => route('companies.index'), 'active' => false],
             ['name' => 'Create', 'url' => '', 'active' => true],
         ];
-
-        return view('companies.create', compact('breadcrumbs'));
+        $users = User::all(); // get all users
+        return view('companies.create', compact('breadcrumbs', 'users'));
     }
 
     public function store(CompanyRequest $request)
     {
         $validatedData = $request->validated();
+        
+// If user already has a company
+$user = User::find($validatedData['user_id']);
+if ($user->company_id) {
+    return redirect()->back()->withErrors(['user_id' => 'The selected user is already assigned to a company.']);
+}
+
+
+
         $company = new Company();
         $company->name = $validatedData['name'];
         $company->address = $validatedData['address'];
         $company->phone = $validatedData['phone'];
         $company->email = $validatedData['email'];
-
+    
         if ($request->hasFile('logo')) {
             $logo = $request->file('logo');
             $logoName = time() . '.' . $logo->getClientOriginalExtension();
             $logo->storeAs('public/logos', $logoName);
             $company->logo = 'logos/' . $logoName;
         }
-
+    
         $company->website = $validatedData['website'];
+    
+        // Kullanıcıyı ata
+        if ($request->has('user_id') && $request->user_id) {
+            $company->user_id = $request->user_id;
+        }
+    
         $company->save();
-
+    
         return redirect()->route('companies.index')->with('status', 'Company created successfully.');
     }
+    
 
     public function show(Company $company)
     {
@@ -101,8 +118,8 @@ class CompanyController extends Controller
             ['name' => 'Companies', 'url' => route('companies.index'), 'active' => false],
             ['name' => 'Edit', 'url' => '', 'active' => true],
         ];
-
-        return view('companies.edit', compact('breadcrumbs', 'company'));
+        $users = User::all(); // get all users
+        return view('companies.edit', compact('breadcrumbs', 'company', 'users'));
     }
 
     public function update(Request $request, $id)
@@ -115,12 +132,13 @@ class CompanyController extends Controller
             'email' => 'nullable|email',
             'website' => 'nullable|url',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'user_id' => 'nullable|exists:users,id',
         ]);
     
-        // Şirketi bul
+        
         $company = Company::findOrFail($id);
     
-        // Eğer logo dosyası varsa, eski logoyu sil ve yeni logoyu yükle
+        
         if ($request->hasFile('logo')) {
             if ($company->logo) {
                 Storage::delete('public/' . $company->logo);
@@ -134,7 +152,7 @@ class CompanyController extends Controller
             $logoPath = $company->logo;
         }
     
-        // Şirketi güncelle
+        
         $company->update([
             'name' => $request->input('name'),
             'address' => $request->input('address'),
@@ -143,6 +161,13 @@ class CompanyController extends Controller
             'website' => $request->input('website'),
             'logo' => $logoPath,
         ]);
+
+        // assign user to company
+    if ($request->user_id) {
+        $user = User::find($request->user_id);
+        $user->company_id = $company->id;
+        $user->save();
+    }
     
         return redirect()->route('companies.index')->with('status', 'Company updated successfully!');
     }

@@ -15,6 +15,10 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             UserSeeder::class,
+            AdminSeeder::class,
+            UserSeeder::class,
+            CompanySeeder::class, // Şirket Seeder'ı ekleyin
+            EmployeeSeeder::class, // Çalışan Seeder'ı ekleyin
         ]);
     }
 }

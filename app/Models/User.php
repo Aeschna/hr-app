@@ -20,6 +20,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'company_id', // Added company_id to mass assignable attributes
     ];
 
     /**
@@ -45,5 +46,9 @@ class User extends Authenticatable
 {
     return $this->is_admin; // `is_admin` alanı true ise admin
 }
+public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
 
 }
