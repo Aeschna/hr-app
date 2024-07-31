@@ -7,6 +7,7 @@ use App\Models\Employee;
 use App\Models\Company;
 use Illuminate\Http\Request;
 
+
 class EmployeeController extends Controller
 {
     public function __construct()

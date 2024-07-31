@@ -25,4 +25,14 @@
 
 
 
+.breadcrumb-item a {
+    color: rgb(0, 0, 0); 
+}
+
+.breadcrumb-item.active {
+    color: rgb(37, 150, 190); 
+}
   
+.trashed {
+    border: 2px solid red;
+}

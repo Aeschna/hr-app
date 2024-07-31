@@ -3,15 +3,11 @@
 @section('content')
 
 <head>
-
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 </head>
 <div class="container">
     <h2>Employees</h2>
     <a href="{{ route('employees.create') }}" class="btn btn-primary">Add Employee</a>
-
-   
-
 
     <!-- Search Form -->
     <form id="searchForm" method="GET" class="mt-3">
@@ -33,9 +29,7 @@
         </select>
 
         <!-- Hidden Checkbox for Including Trashed Records -->
-        <div class="form-check ml-3" style="display: none;">
-            <input type="checkbox" class="form-check-input" id="include_trashed" name="include_trashed" {{ request('include_trashed') == 'on' ? 'checked' : '' }}>
-        </div>
+        <input type="hidden" name="include_trashed" id="include_trashed" value="{{ request('include_trashed', 'off') }}">
 
         <!-- Button to Apply Include Deleted -->
         <button type="button" id="includeDeletedButton" class="btn {{ request('include_trashed') == 'on' ? 'btn-dark' : 'btn-secondary' }} ml-3" onclick="toggleIncludeTrashed()">Include Deleted</button>
@@ -78,7 +72,7 @@
         </thead>
         <tbody>
             @foreach ($employees as $employee)
-            <tr>
+            <tr class="{{ $employee->trashed() ? 'trashed' : '' }}">
                 <td>{{ $employee->first_name }}</td>
                 <td>{{ $employee->last_name }}</td>
                 <td>{{ $employee->email }}</td>
@@ -92,10 +86,10 @@
                             <button type="submit" class="btn btn-success">Restore</button>
                         </form>
                         <form action="{{ route('employees.forceDelete', $employee->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to permanently delete this employee?');">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger">Force Delete</button>
-                </form>
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger">Force Delete</button>
+                        </form>
                     @else
                         <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-info">Edit</a>
                         <form action="{{ route('employees.destroy', $employee->id) }}" method="POST" style="display:inline;" onsubmit="return confirmDelete()">
@@ -114,19 +108,19 @@
     <nav aria-label="Page navigation">
         <ul class="pagination pagination-sm justify-content-center">
             <li class="page-item {{ $employees->onFirstPage() ? 'disabled' : '' }}">
-                <a class="page-link" href="{{ $employees->previousPageUrl() }}" aria-label="Previous">
+                <a class="page-link" href="{{ $employees->appends(request()->except('page'))->previousPageUrl() }}" aria-label="Previous">
                     <i class="fas fa-chevron-left"></i>
                 </a>
             </li>
 
             @for ($i = 1; $i <= $employees->lastPage(); $i++)
                 <li class="page-item {{ $i == $employees->currentPage() ? 'active' : '' }}">
-                    <a class="page-link" href="{{ $employees->url($i) }}">{{ $i }}</a>
+                    <a class="page-link" href="{{ $employees->appends(request()->except('page'))->url($i) }}">{{ $i }}</a>
                 </li>
             @endfor
 
             <li class="page-item {{ $employees->hasMorePages() ? '' : 'disabled' }}">
-                <a class="page-link" href="{{ $employees->nextPageUrl() }}" aria-label="Next">
+                <a class="page-link" href="{{ $employees->appends(request()->except('page'))->nextPageUrl() }}" aria-label="Next">
                     <i class="fas fa-chevron-right"></i>
                 </a>
             </li>
@@ -136,12 +130,19 @@
 
 <script>
     function toggleIncludeTrashed() {
-        var form = document.getElementById('resultsPerPageForm');
+        
         var includeTrashedCheckbox = document.getElementById('include_trashed');
         var includeDeletedButton = document.getElementById('includeDeletedButton');
-        includeTrashedCheckbox.checked = !includeTrashedCheckbox.checked;
+        
+        // Toggle the include_trashed value
+        includeTrashedCheckbox.value = includeTrashedCheckbox.value === 'on' ? 'off' : 'on';
+        
+        // Toggle button classes
         includeDeletedButton.classList.toggle('btn-dark');
         includeDeletedButton.classList.toggle('btn-secondary');
+        
+        // Submit the form
+        var form = document.getElementById('resultsPerPageForm');
         form.submit();
     }
 
@@ -149,7 +150,7 @@
         event.preventDefault();
         var query = this.query.value;
         var perPage = document.getElementById('per_page').value;
-        var includeTrashed = document.getElementById('include_trashed').checked ? 'on' : 'off';
+        var includeTrashed = document.getElementById('include_trashed').value;
         var searchUrl = `{{ route('employees.index') }}?per_page=${perPage}&query=${encodeURIComponent(query)}`;
 
         // Preserve the include_trashed state in the URL
