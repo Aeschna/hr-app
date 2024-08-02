@@ -17,7 +17,7 @@ class Company extends Model
         'email',
         'logo',
         'website',
-        
+        'user_id',
     ];
     protected $dates = ['deleted_at'];
    

@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CompanyRequest;
+use App\Mail\CompanyAdded;
 use App\Models\Company;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+
+use Illuminate\Support\Facades\Mail;
+
 
 class CompanyController extends Controller
 {
@@ -69,42 +73,43 @@ class CompanyController extends Controller
         return view('companies.create', compact('breadcrumbs', 'users'));
     }
 
-    public function store(CompanyRequest $request)
-    {
-        $validatedData = $request->validated();
-        
-// If user already has a company
-$user = User::find($validatedData['user_id']);
-if ($user->company_id) {
-    return redirect()->back()->withErrors(['user_id' => 'The selected user is already assigned to a company.']);
-}
-
-
-
-        $company = new Company();
-        $company->name = $validatedData['name'];
-        $company->address = $validatedData['address'];
-        $company->phone = $validatedData['phone'];
-        $company->email = $validatedData['email'];
     
-        if ($request->hasFile('logo')) {
-            $logo = $request->file('logo');
-            $logoName = time() . '.' . $logo->getClientOriginalExtension();
-            $logo->storeAs('public/logos', $logoName);
-            $company->logo = 'logos/' . $logoName;
-        }
+   public function store(CompanyRequest $request)
+{
+    $validatedData = $request->validated();
     
-        $company->website = $validatedData['website'];
-    
-        // Kullanıcıyı ata
-        if ($request->has('user_id') && $request->user_id) {
-            $company->user_id = $request->user_id;
-        }
-    
-        $company->save();
-    
-        return redirect()->route('companies.index')->with('status', 'Company created successfully.');
+    // Check if user already has a company
+    $user = User::find($validatedData['user_id']);
+    if ($user->company_id) {
+        return redirect()->back()->withErrors(['user_id' => 'The selected user is already assigned to a company.']);
     }
+
+    $company = new Company();
+    $company->name = $validatedData['name'];
+    $company->address = $validatedData['address'];
+    $company->phone = $validatedData['phone'];
+    $company->email = $validatedData['email'];
+    
+    if ($request->hasFile('logo')) {
+        $logo = $request->file('logo');
+        $logoName = time() . '.' . $logo->getClientOriginalExtension();
+        $logo->storeAs('public/logos', $logoName);
+        $company->logo = 'logos/' . $logoName;
+    }
+    
+    $company->website = $validatedData['website'];
+    
+    if ($request->has('user_id') && $request->user_id) {
+        $company->user_id = $request->user_id;
+    }
+    
+    $company->save();
+    
+    // Send email notification
+    Mail::to('20comp1013@isik.edu.tr')->send(new CompanyAdded($company));
+    
+    return redirect()->route('companies.index')->with('status', 'Company created successfully.');
+}
     
 
     public function show(Company $company)

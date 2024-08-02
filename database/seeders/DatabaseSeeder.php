@@ -39,7 +39,7 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        User::factory(10)->create(); // Create 10 random employees
+        User::factory(20)->create(); // Create 10 random employees
     }
 }
 
