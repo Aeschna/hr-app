@@ -30,6 +30,12 @@ Route::middleware('auth')->group(function() {
     
     // Form creation route (not typically resourceful, ensure it's needed)
     Route::get('/companies/create', [CompanyController::class, 'create'])->name('companies.create');
+    
+    // My Account route
+    Route::get('/my-account', [AccountController::class, 'index'])->name('my-account');
+    // My Account update route
+    Route::put('/my-account', [AccountController::class, 'update'])->name('account.update');
+    
 });
 
 // Authentication routes
@@ -46,7 +52,9 @@ Route::put('employees/{id}/restore', [EmployeeController::class, 'restore'])->na
 Route::delete('/employees/{id}/force-delete', [EmployeeController::class, 'forceDelete'])->name('employees.forceDelete');
 Route::delete('/companies/{id}/force-delete', [CompanyController::class, 'forceDelete'])->name('companies.forceDelete');
 
-// My Account route
-Route::middleware('auth')->get('/my-account', [AccountController::class, 'index'])->name('my-account');
-// My Account update route
-Route::middleware('auth')->put('/my-account', [AccountController::class, 'update'])->name('account.update');
+// Route to show the change password form
+Route::middleware('auth')->get('/password/change', [AccountController::class, 'showChangePasswordForm'])->name('password.change');
+
+// Route to handle the password change request
+Route::middleware('auth')->put('/password/change', [AccountController::class, 'changePassword'])->name('password.update');
+

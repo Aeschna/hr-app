@@ -1,8 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Hash;
 
 use Illuminate\Http\Request;
+
 
 class AccountController extends Controller
 {
@@ -19,15 +21,42 @@ class AccountController extends Controller
     }
     public function update(Request $request)
 {
+    // Validate the request
     $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255',
+        'name' => 'sometimes|string|max:255',
+        'email' => 'sometimes|string|email|max:255|unique:users,email,' . auth()->id(),
     ]);
 
-    $user = $request->user();
+    // Update user information
+    $user = auth()->user();
     $user->update($request->only('name', 'email'));
 
-    return redirect()->route('my-account')->with('success', 'Account updated successfully.');
+    // Redirect with a success message
+    return redirect()->route('my-account')->with('status', 'Account information updated successfully.');
 }
+
+public function showChangePasswordForm()
+{
+    return view('password.change');
+}
+public function changePassword(Request $request)
+{
+    // Validate the password change request
+    $request->validate([
+        'current_password' => 'required|string',
+        'new_password' => 'required|string|min:8|confirmed',
+    ]);
+
+    // Check current password
+    if (!Hash::check($request->current_password, auth()->user()->password)) {
+        return back()->withErrors(['current_password' => 'Current password does not match.']);
+    }
+
+    // Update password
+    auth()->user()->update(['password' => Hash::make($request->new_password)]);
+
+    return redirect()->route('my-account')->with('status', 'Password changed successfully.');
+}
+
 
 }

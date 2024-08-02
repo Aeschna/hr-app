@@ -1,46 +1,45 @@
-<!-- resources/views/my-account.blade.php -->
-
 @extends('layouts.app')
 
 @section('content')
 <div class="container">
-    <h2>My Account</h2>
+    <h1>My Account</h1>
 
-    <!-- Notification message -->
-    @if (session('status'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('status') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+    <!-- User Info Section -->
+    <div class="card mb-4">
+        <div class="card-header">Account Information</div>
+        <div class="card-body">
+            <!-- Display user information here, e.g., name, email -->
+            <p><strong>Name:</strong> {{ Auth::user()->name }}</p>
+            <p><strong>Email:</strong> {{ Auth::user()->email }}</p>
         </div>
-    @endif
+    </div>
 
-    <!-- Password change form -->
-    <form method="POST" action="{{ route('account.updatePassword') }}">
-        @csrf
-        <div class="form-group">
-            <label for="current_password">Current Password</label>
-            <input type="password" class="form-control" id="current_password" name="current_password" required>
-            @error('current_password')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
+    <!-- Password Change Section -->
+    <div class="card">
+        <div class="card-header">Change Password</div>
+        <div class="card-body">
+            <form action="{{ route('account.update') }}" method="POST">
+                @csrf
+                @method('PUT')
+
+                <div class="form-group">
+                    <label for="current_password">Current Password</label>
+                    <input type="password" id="current_password" name="current_password" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="new_password">New Password</label>
+                    <input type="password" id="new_password" name="new_password" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="new_password_confirmation">Confirm New Password</label>
+                    <input type="password" id="new_password_confirmation" name="new_password_confirmation" class="form-control" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Change Password</button>
+            </form>
         </div>
-
-        <div class="form-group">
-            <label for="new_password">New Password</label>
-            <input type="password" class="form-control" id="new_password" name="new_password" required>
-            @error('new_password')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
-
-        <div class="form-group">
-            <label for="new_password_confirmation">Confirm New Password</label>
-            <input type="password" class="form-control" id="new_password_confirmation" name="new_password_confirmation" required>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Update Password</button>
-    </form>
+    </div>
 </div>
 @endsection
