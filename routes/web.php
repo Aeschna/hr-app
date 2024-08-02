@@ -6,6 +6,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AccountController;
 
 // Home route
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -44,3 +45,8 @@ Route::put('employees/{id}/restore', [EmployeeController::class, 'restore'])->na
 // Force delete
 Route::delete('/employees/{id}/force-delete', [EmployeeController::class, 'forceDelete'])->name('employees.forceDelete');
 Route::delete('/companies/{id}/force-delete', [CompanyController::class, 'forceDelete'])->name('companies.forceDelete');
+
+// My Account route
+Route::middleware('auth')->get('/my-account', [AccountController::class, 'index'])->name('my-account');
+// My Account update route
+Route::middleware('auth')->put('/my-account', [AccountController::class, 'update'])->name('account.update');

@@ -42,6 +42,9 @@
                 </li>
             @else
                 <li class="nav-item">
+                    <a class="nav-link" href="{{ route('my-account') }}">My Account</a>
+                </li>
+                <li class="nav-item">
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="btn btn-link nav-link">Logout</button>
@@ -77,10 +80,6 @@
                         <li class="breadcrumb-item active" aria-current="page">Details</li>
                     @endif
                 @endif
-
-
-              
-                <!-- Additional breadcrumb items can be added as needed -->
             </ol>
         </nav>
     @endif
