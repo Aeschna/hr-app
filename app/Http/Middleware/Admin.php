@@ -21,6 +21,6 @@ class Admin
             return $next($request);
         }
 
-        return redirect('home');
+        return redirect('home')->with('error', 'You do not have access to this page.');
     }
 }

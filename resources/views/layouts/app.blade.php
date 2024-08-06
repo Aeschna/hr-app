@@ -10,6 +10,7 @@
     <!-- Place additional stylesheets or scripts here -->
 </head>
 <body>
+    
 <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
     <a class="navbar-brand" href="{{ url('/') }}" style="font-size: 1.5rem;">
         <img src="{{ asset('storage/logos/Hr App.png') }}" style="height: 40px;">
@@ -22,7 +23,7 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             @auth
-                @if(auth()->user()->is_admin || (auth()->user()->company_id == request()->route('company')))
+                @if(Auth::user()->isAdmin())
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('companies.index') }}">Companies</a>
                     </li>
@@ -33,7 +34,6 @@
                 <!-- Add more navigation items as needed -->
             @endauth
         </ul>
-
         <!-- Right-side navigation items -->
         <ul class="navbar-nav ml-auto">
             @guest
