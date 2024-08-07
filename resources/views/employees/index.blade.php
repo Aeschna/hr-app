@@ -38,6 +38,7 @@
     @if (request()->has('query'))
         <a href="{{ route('employees.index') }}" class="btn btn-secondary mb-3">Back to Employees</a>
     @endif
+    
 
     <table class="table table-bordered mt-3">
         <thead>

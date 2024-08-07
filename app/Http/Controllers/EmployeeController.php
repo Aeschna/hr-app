@@ -6,7 +6,7 @@ use App\Http\Requests\EmployeeRequest;
 use App\Models\Employee;
 use App\Models\Company;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
 
 class EmployeeController extends Controller
 {
@@ -16,49 +16,61 @@ class EmployeeController extends Controller
     }
 
     public function index(Request $request)
-    {
-        // Breadcrumb verileri
-        $breadcrumbs = [
-            ['name' => 'Home', 'url' => route('home')],
-            ['name' => 'Employees', 'url' => route('employees.index')],
-        ];
+{
+    // Breadcrumb verileri
+    $breadcrumbs = [
+        ['name' => 'Home', 'url' => route('home')],
+        ['name' => 'Employees', 'url' => route('employees.index')],
+    ];
 
-        $perPageOptions = [10, 50, 100];
-        $perPage = $request->input('per_page', 10);
-        $query = Employee::query();
+    $perPageOptions = [10, 50, 100];
+    $perPage = $request->input('per_page', 10);
+    $query = Employee::query();
 
-        if ($request->input('include_trashed') == 'on') {
-            $query->withTrashed();
-        }
+    
 
-        if ($request->has('query')) {
-            $query->where(function ($subQuery) use ($request) {
-                $searchTerm = '%' . $request->input('query') . '%';
-                $subQuery->where('first_name', 'like', $searchTerm)
-                         ->orWhere('last_name', 'like', $searchTerm)
-                         ->orWhere('email', 'like', $searchTerm)
-                         ->orWhere('phone', 'like', $searchTerm)
-                         ->orWhereHas('company', function ($q) use ($searchTerm) {
-                             $q->where('name', 'like', $searchTerm);
-                         });
-            });
-        }
+    // Kullanıcının bağlı olduğu şirketi al
+    $user = Auth::user();
+    $companyId = $user->company_id;
 
-        $sort = $request->input('sort', 'first_name');
-        $direction = $request->input('direction', 'asc');
+    
 
-        if ($sort === 'company') {
-            $query->join('companies', 'employees.company_id', '=', 'companies.id')
-                  ->orderBy('companies.name', $direction)
-                  ->select('employees.*');
-        } else {
-            $query->orderBy($sort, $direction);
-        }
+    // Sadece kullanıcının bağlı olduğu şirketin çalışanlarını göster
+    $query->where('company_id', $companyId);
 
-        $employees = $query->paginate($perPage);
-
-        return view('employees.index', compact('employees', 'perPageOptions', 'perPage', 'sort', 'direction', 'breadcrumbs'));
+    if ($request->input('include_trashed') == 'on') {
+        $query->withTrashed();
     }
+
+    if ($request->has('query')) {
+        $query->where(function ($subQuery) use ($request) {
+            $searchTerm = '%' . $request->input('query') . '%';
+            $subQuery->where('first_name', 'like', $searchTerm)
+                     ->orWhere('last_name', 'like', $searchTerm)
+                     ->orWhere('email', 'like', $searchTerm)
+                     ->orWhere('phone', 'like', $searchTerm)
+                     ->orWhereHas('company', function ($q) use ($searchTerm) {
+                         $q->where('name', 'like', $searchTerm);
+                     });
+        });
+    }
+
+    $sort = $request->input('sort', 'first_name');
+    $direction = $request->input('direction', 'asc');
+
+    if ($sort === 'company') {
+        $query->join('companies', 'employees.company_id', '=', 'companies.id')
+              ->orderBy('companies.name', $direction)
+              ->select('employees.*');
+    } else {
+        $query->orderBy($sort, $direction);
+    }
+
+    $employees = $query->paginate($perPage);
+
+    return view('employees.index', compact('employees', 'perPageOptions', 'perPage', 'sort', 'direction', 'breadcrumbs'));
+}
+
 
     public function create()
     {
