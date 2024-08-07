@@ -22,7 +22,11 @@ class EmployeeRequest extends FormRequest
         return [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'nullable|email|max:255|unique:employees,email,' . $this->employee,
+            'email' => [
+            'nullable',
+            'email',
+            'regex:/^[\w\.-]+@(example\.com|example\.org|example\.net)$/i'
+        ],
             'phone' => 'required|string|max:15|regex:/^[0-9+\(\)#\.\s\/ext-]+$/',
             'company_id' => 'required|exists:companies,id',
         ];
@@ -31,6 +35,7 @@ class EmployeeRequest extends FormRequest
     {
         return [
             'phone.regex' => 'Please enter a valid phone number',
+            'email.regex' => 'Please enter a valid email address',
         ];
     }
 }

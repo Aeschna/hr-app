@@ -74,6 +74,10 @@ class EmployeeController extends Controller
 
     public function create()
     {
+
+        $user = auth()->user();
+    $company = $user->company; // Kullanıcının bağlı olduğu şirketi al
+
         // Breadcrumb verileri
         $breadcrumbs = [
             ['name' => 'Home', 'url' => route('home')],
@@ -82,7 +86,7 @@ class EmployeeController extends Controller
         ];
 
         $companies = Company::all();
-        return view('employees.create', compact('companies', 'breadcrumbs'));
+        return view('employees.create', compact('companies','company', 'breadcrumbs'));
     }
 
     public function store(Request $request)
@@ -91,8 +95,12 @@ class EmployeeController extends Controller
     $request->validate([
         'first_name' => 'required|string|max:255',
         'last_name' => 'required|string|max:255',
-        'email' => 'nullable|email',
-        'phone' => 'required|string|max:20',
+        'email' => [
+            'nullable',
+            'email',
+            'regex:/^[\w\.-]+@(example\.com|example\.org|example\.net)$/i'
+        ],
+        'phone' => 'required|string|max:20|regex:/^\+?[0-9\s\-\(\)]+$/',
         'company_id' => 'required|exists:companies,id',
     ]);
 
@@ -135,8 +143,12 @@ class EmployeeController extends Controller
     $request->validate([
         'first_name' => 'required|string|max:255',
         'last_name' => 'required|string|max:255',
-        'email' => 'nullable|email',
-        'phone' => 'required|string|max:20',
+        'email' => [
+            'nullable',
+            'email',
+            'regex:/^[\w\.-]+@(example\.com|example\.org|example\.net)$/i'
+        ],
+        'phone' => 'required|string|max:20|regex:/^\+?[0-9\s\-\(\)]+$/',
         'company_id' => 'required|exists:companies,id',
     ]);
 

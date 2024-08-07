@@ -22,18 +22,18 @@ Route::middleware('auth')->group(function() {
     // Admin-only routes (ensure admin middleware is properly defined)
     Route::middleware('admin')->group(function() {
         Route::resource('companies', CompanyController::class);
-        Route::resource('employees', EmployeeController::class);
+        
         Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
        // Route::get('/companies', [CompanyController::class, 'index'])->name('companies.index');
 
        // Form creation route (not typically resourceful, ensure it's needed)
     Route::get('/companies/create', [CompanyController::class, 'create'])->name('companies.create');
     });
-
+Route::resource('employees', EmployeeController::class);
     // User-only routes
     //Route::resource('companies', CompanyController::class)->only(['index', 'show']);
     Route::resource('employees', EmployeeController::class)->only(['index', 'show']);
-    
+    Route::get('/employees/create', [EmployeeController::class, 'create'])->name('employees.create');
     
     
     // My Account route
