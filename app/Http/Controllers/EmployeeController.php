@@ -7,6 +7,13 @@ use App\Models\Employee;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\EmployeeAdded;
+use App\Mail\EmployeeUpdated;
+use App\Mail\EmployeeSoftDeleted;
+use App\Mail\EmployeeRestored;
+use App\Mail\EmployeePermanentlyDeleted;
+
 
 class EmployeeController extends Controller
 {
@@ -90,26 +97,30 @@ class EmployeeController extends Controller
     }
 
     public function store(Request $request)
-{
-    // Form verilerini doğrulayın
-    $request->validate([
-        'first_name' => 'required|string|max:255',
-        'last_name' => 'required|string|max:255',
-        'email' => [
-            'nullable',
-            'email',
-            'regex:/^[\w\.-]+@(example\.com|example\.org|example\.net)$/i'
-        ],
-        'phone' => 'required|string|max:20|regex:/^\+?[0-9\s\-\(\)]+$/',
-        'company_id' => 'required|exists:companies,id',
-    ]);
-
-    // Yeni kullanıcıyı oluşturun
-    Employee::create($request->all());
-
-    // Kullanıcıyı yönlendirin ve başarılı bildirim mesajı gösterin
-    return redirect()->route('employees.index')->with('status', 'Employee created successfully!');
-}
+    {
+        // Validate the form data
+        $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => [
+                'nullable',
+                'email',
+                'regex:/^[\w\.-]+@(gmail\.com|hotmail\.com|outlook\.com|yahoo\.com|aol\.com|example\.org|example\.net)$/i'
+            ],
+            'phone' => 'required|string|max:20|regex:/^\+?[0-9\s\-\(\)]+$/',
+            'company_id' => 'required|exists:companies,id',
+        ]);
+    
+        // Create a new employee
+        $employee = Employee::create($request->all());
+    
+        // Send email notification
+        Mail::to('example@example.com')->send(new EmployeeAdded($employee));
+    
+        // Redirect and show success message
+        return redirect()->route('employees.index')->with('status', 'Employee created successfully!');
+    }
+    
 
 
     public function show(Employee $employee)
@@ -146,7 +157,7 @@ class EmployeeController extends Controller
         'email' => [
             'nullable',
             'email',
-            'regex:/^[\w\.-]+@(example\.com|example\.org|example\.net)$/i'
+            'regex:/^[\w\.-]+@(gmail\.com|hotmail\.com|outlook\.com|yahoo\.com|aol\.com|example\.org|example\.net)$/i'
         ],
         'phone' => 'required|string|max:20|regex:/^\+?[0-9\s\-\(\)]+$/',
         'company_id' => 'required|exists:companies,id',
@@ -163,7 +174,7 @@ class EmployeeController extends Controller
         'phone' => $request->input('phone'),
         'company_id' => $request->input('company_id'),
     ]);
-
+    Mail::to('20comp1013@isik.edu.tr')->send(new EmployeeUpdated($employee));
     return redirect()->route('employees.index')->with('status', 'Employee updated successfully!');
 }
 
@@ -175,9 +186,12 @@ class EmployeeController extends Controller
         if ($employee->trashed()) {
             $employee->forceDelete();
             session()->flash('status', 'Employee permanently deleted!');
+            // Send email notification for permanent delete
+        Mail::to('20comp1013@isik.edu.tr')->send(new EmployeePermanentlyDeleted($employee));
         } else {
             $employee->delete();
             session()->flash('status', 'Employee deleted!');
+            Mail::to('20comp1013@isik.edu.tr')->send(new EmployeeSoftDeleted($employee));
         }
 
         return redirect()->route('employees.index');
@@ -190,6 +204,7 @@ class EmployeeController extends Controller
         if ($employee->trashed()) {
             $employee->forceDelete();
             session()->flash('status', 'Employee permanently deleted!');
+            Mail::to('20comp1013@isik.edu.tr')->send(new EmployeePermanentlyDeleted($employee));
         } else {
             session()->flash('status', 'Employee is not deleted yet, soft delete the employee first!');
         }
@@ -201,7 +216,7 @@ class EmployeeController extends Controller
     {
         $employee = Employee::withTrashed()->findOrFail($id);
         $employee->restore();
-
+        Mail::to('20comp1013@isik.edu.tr')->send(new EmployeeRestored($employee));
         return redirect()->route('employees.index')->with('status', 'Employee restored successfully.');
     }
 }

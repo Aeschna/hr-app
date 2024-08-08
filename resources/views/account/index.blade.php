@@ -1,6 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+
+<head>
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+</head>
 <div class="container">
     <h1>My Account</h1>
 
@@ -8,10 +12,10 @@
         
         <div class="col-md-6">
             <!-- Account Information Section -->
-            <div class="card mb-4">
+            <div class="card mb-4 h-100">
                 <div class="card-header">Account Information</div>
-                <div class="card-body">
-                    <form method="POST" action="{{ route('account.update') }}">
+                <div class="card-body d-flex flex-column">
+                    <form method="POST" action="{{ route('account.update') }}" class="flex-grow-1">
                         @csrf
                         @method('PUT')
 
@@ -43,10 +47,10 @@
 
         <!-- Password Change Section -->
         <div class="col-md-6">
-            <div class="card">
+            <div class="card h-100">
                 <div class="card-header">Change Password</div>
-                <div class="card-body">
-                    <form action="{{ route('password.change') }}" method="POST">
+                <div class="card-body d-flex flex-column">
+                    <form action="{{ route('password.change') }}" method="POST" class="flex-grow-1">
                         @csrf
                         @method('PUT')
 

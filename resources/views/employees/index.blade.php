@@ -5,7 +5,17 @@
 <head>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 </head>
+
 <div class="container">
+    <div class="my-4 p-3 bg-light border rounded">
+        <h2 class="text-center mb-0">
+            {{ auth()->user()->company->name ?? 'No Company Assigned' }}
+        </h2>
+    </div>
+</div>
+
+
+
     <h2>Employees</h2>
     <a href="{{ route('employees.create') }}" class="btn btn-primary">Add Employee</a>
 
@@ -39,7 +49,6 @@
         <a href="{{ route('employees.index') }}" class="btn btn-secondary mb-3">Back to Employees</a>
     @endif
     
-
     <table class="table table-bordered mt-3">
         <thead>
             <tr>

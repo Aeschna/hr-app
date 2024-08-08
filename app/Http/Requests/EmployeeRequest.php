@@ -25,7 +25,7 @@ class EmployeeRequest extends FormRequest
             'email' => [
             'nullable',
             'email',
-            'regex:/^[\w\.-]+@(example\.com|example\.org|example\.net)$/i'
+            'regex:/^[\w\.-]+@(gmail\.com|hotmail\.com|outlook\.com|yahoo\.com|aol\.com|example\.org|example\.net)$/i'
         ],
             'phone' => 'required|string|max:15|regex:/^[0-9+\(\)#\.\s\/ext-]+$/',
             'company_id' => 'required|exists:companies,id',
