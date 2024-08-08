@@ -16,7 +16,7 @@ class AddUserIdToCompaniesTable extends Migration
         Schema::table('companies', function (Blueprint $table) {
             $table->unsignedBigInteger('user_id')->nullable()->after('website');
             
-            // Eğer foreign key eklemek istiyorsanız:
+            // for foreign key:
             // $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
         });
     }

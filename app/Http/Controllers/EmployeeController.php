@@ -24,7 +24,7 @@ class EmployeeController extends Controller
 
     public function index(Request $request)
 {
-    // Breadcrumb verileri
+    
     $breadcrumbs = [
         ['name' => 'Home', 'url' => route('home')],
         ['name' => 'Employees', 'url' => route('employees.index')],
@@ -36,13 +36,13 @@ class EmployeeController extends Controller
 
     
 
-    // Kullanıcının bağlı olduğu şirketi al
+    // get user's linked company
     $user = Auth::user();
     $companyId = $user->company_id;
 
     
 
-    // Sadece kullanıcının bağlı olduğu şirketin çalışanlarını göster
+    // show only employees which belongs to company
     $query->where('company_id', $companyId);
 
     if ($request->input('include_trashed') == 'on') {
@@ -83,9 +83,9 @@ class EmployeeController extends Controller
     {
 
         $user = auth()->user();
-    $company = $user->company; // Kullanıcının bağlı olduğu şirketi al
+    $company = $user->company; 
 
-        // Breadcrumb verileri
+        
         $breadcrumbs = [
             ['name' => 'Home', 'url' => route('home')],
             ['name' => 'Employees', 'url' => route('employees.index')],
@@ -125,7 +125,7 @@ class EmployeeController extends Controller
 
     public function show(Employee $employee)
     {
-        // Breadcrumb verileri
+       
         $breadcrumbs = [
             ['name' => 'Home', 'url' => route('home')],
             ['name' => 'Employees', 'url' => route('employees.index')],
@@ -137,7 +137,7 @@ class EmployeeController extends Controller
 
     public function edit(Employee $employee)
     {
-        // Breadcrumb verileri
+        
         $breadcrumbs = [
             ['name' => 'Home', 'url' => route('home')],
             ['name' => 'Employees', 'url' => route('employees.index')],

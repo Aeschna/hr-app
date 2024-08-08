@@ -23,6 +23,6 @@ class AdminMiddleware
             
         }
 
-        return redirect('/'); // Eğer kullanıcı admin değilse ana sayfaya yönlendir.
+        return redirect('/'); // direct if it is not admin
     }
 }

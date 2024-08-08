@@ -16,7 +16,7 @@ class Admin
      */
     public function handle(Request $request, Closure $next)
     {
-        // Admin kontrolünü buraya ekleyin
+        
         if (auth()->user() && auth()->user()->is_admin) {
             return $next($request);
         }

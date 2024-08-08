@@ -44,7 +44,7 @@ class User extends Authenticatable
     ];
     public function isAdmin()
 {
-    return $this->is_admin; // `is_admin` alanı true ise admin
+    return $this->is_admin; 
 }
 public function company()
     {

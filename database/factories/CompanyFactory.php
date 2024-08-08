@@ -19,7 +19,7 @@ class CompanyFactory extends Factory
             'address' => $this->faker->address,
             'phone' => $this->faker->phoneNumber,
             'email' => $this->faker->unique()->companyEmail,
-            'logo' => 'logos/default.png', // Varsayılan bir logo koyabilirsiniz
+            'logo' => 'storage/logos/company.png', // use default logo
             'website' => $this->faker->url,
         ];
     }

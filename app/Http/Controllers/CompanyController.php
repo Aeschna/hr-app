@@ -21,7 +21,7 @@ class CompanyController extends Controller
 
     public function index(Request $request)
     {
-        // Breadcrumb verileri
+        // Breadcrumb datas
         $breadcrumbs = [
             ['name' => 'Home', 'url' => route('home')],
             ['name' => 'Companies', 'url' => route('companies.index')],
@@ -136,7 +136,7 @@ class CompanyController extends Controller
 
     public function update(Request $request, $id)
     {
-        // Veritabanı doğrulama kuralları
+        
         $request->validate([
             'name' => 'required|string|max:255',
             'address' => 'nullable|string',
