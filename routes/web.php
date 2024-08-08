@@ -10,9 +10,9 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\UserController;
-
+use App\Http\Controllers\DashboardController;
 // Home route
-Route::get('/', [HomeController::class, 'index'])->name('home');
+//Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Search routes
 Route::get('/companies/search', [CompanyController::class, 'search'])->name('companies.search');
@@ -61,6 +61,8 @@ Route::resource('employees', EmployeeController::class);
     // Change Password Routes
     Route::get('/password/change', [AccountController::class, 'showChangePasswordForm'])->name('password.change');
     Route::put('/password/change', [AccountController::class, 'changePassword'])->name('password.update');
+
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 });
 
 // Authentication routes
@@ -84,3 +86,5 @@ Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestF
 Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
 Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
+
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

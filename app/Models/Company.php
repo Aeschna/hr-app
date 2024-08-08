@@ -25,5 +25,33 @@ class Company extends Model
     {
         return $this->hasMany(User::class);
     }
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($company) {
+            ActivityLog::create([
+                'type' => 'Added',
+                'model_type' => 'Company',
+                'model_id' => $company->id,
+            ]);
+        });
+
+        static::deleted(function ($company) {
+            ActivityLog::create([
+                'type' => 'Deleted',
+                'model_type' => 'Company',
+                'model_id' => $company->id,
+            ]);
+        });
+
+        static::restored(function ($company) {
+            ActivityLog::create([
+                'type' => 'Restored',
+                'model_type' => 'Company',
+                'model_id' => $company->id,
+            ]);
+        });
+    }
 }
 

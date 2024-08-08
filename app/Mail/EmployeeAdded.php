@@ -19,7 +19,7 @@ class EmployeeAdded extends Mailable
 
     public function build()
     {
-        return $this->view('emails.employee_added') // Ensure the view file name is correct
+        return $this->view('emails.employee.employee_added') // Ensure the view file name is correct
                     ->with([
                         'employeeName' => $this->employee->first_name . ' ' . $this->employee->last_name,
                         'employeeEmail' => $this->employee->email,

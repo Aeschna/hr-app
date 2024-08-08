@@ -24,4 +24,32 @@ class Employee extends Model
     {
         return $this->belongsTo(Company::class);
     }
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($employee) {
+            ActivityLog::create([
+                'type' => 'Added',
+                'model_type' => 'Employee',
+                'model_id' => $employee->id,
+            ]);
+        });
+
+        static::deleted(function ($employee) {
+            ActivityLog::create([
+                'type' => 'Deleted',
+                'model_type' => 'Employee',
+                'model_id' => $employee->id,
+            ]);
+        });
+
+        static::restored(function ($employee) {
+            ActivityLog::create([
+                'type' => 'Restored',
+                'model_type' => 'Employee',
+                'model_id' => $employee->id,
+            ]);
+        });
+}
 }

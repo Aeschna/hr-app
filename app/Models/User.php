@@ -51,5 +51,32 @@ public function company()
     {
         return $this->belongsTo(Company::class);
     }
+    protected static function boot()
+    {
+        parent::boot();
 
+        static::created(function ($user) {
+            ActivityLog::create([
+                'type' => 'Added',
+                'model_type' => 'User',
+                'model_id' => $user->id,
+            ]);
+        });
+
+        static::deleted(function ($user) {
+            ActivityLog::create([
+                'type' => 'Deleted',
+                'model_type' => 'User',
+                'model_id' => $user->id,
+            ]);
+        });
+
+        static::restored(function ($user) {
+            ActivityLog::create([
+                'type' => 'Restored',
+                'model_type' => 'User',
+                'model_id' => $user->id,
+            ]);
+        });
+}
 }
