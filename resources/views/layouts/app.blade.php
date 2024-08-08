@@ -25,7 +25,10 @@
             @auth
                 @if(Auth::user()->isAdmin())
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('companies.index') }}">Companies</a>
+                        <a class="nav-link" href="{{ route('users.index') }}">Users</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{{ route('companies.index') }}">Companies</a>  
                     </li>
                 @endif
                 <li class="nav-item">
@@ -55,6 +58,7 @@
     </div>
 </nav>
 
+
 <div class="container mt-4">
     <!-- Breadcrumb -->
     @if (!request()->routeIs('login'))
@@ -77,6 +81,15 @@
                     @elseif (request()->routeIs('employees.edit'))
                         <li class="breadcrumb-item active" aria-current="page">Edit</li>
                     @elseif (request()->routeIs('employees.show'))
+                        <li class="breadcrumb-item active" aria-current="page">Details</li>
+                    @endif
+                    @elseif (request()->routeIs('users.*'))
+                    <li class="breadcrumb-item"><a href="{{ route('users.index') }}">Users</a></li>
+                    @if (request()->routeIs('users.create'))
+                        <li class="breadcrumb-item active" aria-current="page">Create</li>
+                    @elseif (request()->routeIs('users.edit'))
+                        <li class="breadcrumb-item active" aria-current="page">Edit</li>
+                    @elseif (request()->routeIs('users.show'))
                         <li class="breadcrumb-item active" aria-current="page">Details</li>
                     @endif
                 @endif

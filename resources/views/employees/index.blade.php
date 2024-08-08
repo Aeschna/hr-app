@@ -7,17 +7,17 @@
 </head>
 
 <div class="container">
+    <!-- Display company name only if the user is not an admin -->
+    @if (!auth()->user()->isAdmin())
     <div class="my-4 p-3 bg-light border rounded">
         <h2 class="text-center mb-0">
             {{ auth()->user()->company->name ?? 'No Company Assigned' }}
         </h2>
     </div>
-</div>
-
-
+    @endif
 
     <h2>Employees</h2>
-    <a href="{{ route('employees.create') }}" class="btn btn-primary">Add Employee</a>
+    <a href="{{ route('employees.create') }}" class="btn btn-primary mb-3">Add Employee</a>
 
     <!-- Search Form -->
     <form id="searchForm" method="GET" class="mt-3">
@@ -31,88 +31,104 @@
 
     <!-- Dropdown Button for Results Per Page and Include Deleted Button -->
     <form id="resultsPerPageForm" action="{{ route('employees.index') }}" method="GET" class="form-inline mb-3">
-        <label for="per_page" class="mr-2">Results per page: </label>
-        <select name="per_page" id="per_page" class="form-control" onchange="this.form.submit()">
-            @foreach($perPageOptions as $option)
-                <option value="{{ $option }}" {{ $perPage == $option ? 'selected' : '' }}>{{ $option }}</option>
-            @endforeach
-        </select>
+        <div class="form-group mr-3">
+            <label for="per_page" class="mr-2">Results per page:</label>
+            <select name="per_page" id="per_page" class="form-control" onchange="this.form.submit()">
+                @foreach($perPageOptions as $option)
+                    <option value="{{ $option }}" {{ $perPage == $option ? 'selected' : '' }}>{{ $option }}</option>
+                @endforeach
+            </select>
+        </div>
 
         <!-- Hidden Checkbox for Including Trashed Records -->
         <input type="hidden" name="include_trashed" id="include_trashed" value="{{ request('include_trashed', 'off') }}">
 
         <!-- Button to Apply Include Deleted -->
-        <button type="button" id="includeDeletedButton" class="btn {{ request('include_trashed') == 'on' ? 'btn-dark' : 'btn-secondary' }} ml-3" onclick="toggleIncludeTrashed()">Include Deleted</button>
+        <button type="button" id="includeDeletedButton" class="btn {{ request('include_trashed') == 'on' ? 'btn-dark' : 'btn-secondary' }} ml-3" onclick="toggleIncludeTrashed()">
+            Include Deleted
+        </button>
     </form>
 
     @if (request()->has('query'))
         <a href="{{ route('employees.index') }}" class="btn btn-secondary mb-3">Back to Employees</a>
     @endif
     
-    <table class="table table-bordered mt-3">
-        <thead>
-            <tr>
-                <th>
-                    <a href="{{ route('employees.index', array_merge(request()->all(), ['sort' => 'first_name', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}">
-                        First Name
-                    </a>
-                </th>
-                <th>
-                    <a href="{{ route('employees.index', array_merge(request()->all(), ['sort' => 'last_name', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}">
-                        Last Name
-                    </a>
-                </th>
-                <th>
-                    <a href="{{ route('employees.index', array_merge(request()->all(), ['sort' => 'email', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}">
-                        Email
-                    </a>
-                </th>
-                <th>
-                    <a href="{{ route('employees.index', array_merge(request()->all(), ['sort' => 'phone', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}">
-                        Phone
-                    </a>
-                </th>
-                <th>
-                    <a href="{{ route('employees.index', array_merge(request()->all(), ['sort' => 'company', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}">
-                        Company
-                    </a>
-                </th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($employees as $employee)
-            <tr class="{{ $employee->trashed() ? 'trashed' : '' }}">
-                <td>{{ $employee->first_name }}</td>
-                <td>{{ $employee->last_name }}</td>
-                <td>{{ $employee->email }}</td>
-                <td>{{ $employee->phone }}</td>
-                <td>{{ $employee->company->name ?? 'N/A' }}</td>
-                <td>
-                    @if($employee->trashed())
-                        <form action="{{ route('employees.restore', $employee->id) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('PUT')
-                            <button type="submit" class="btn btn-success">Restore</button>
-                        </form>
-                        <form action="{{ route('employees.forceDelete', $employee->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to permanently delete this employee?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger">Force Delete</button>
-                        </form>
-                    @else
-                        <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-info">Edit</a>
-                        <form action="{{ route('employees.destroy', $employee->id) }}" method="POST" style="display:inline;" onsubmit="return confirmDelete()">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger">Delete</button>
-                        </form>
-                    @endif
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+   
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>
+                        <a href="{{ route('employees.index', array_merge(request()->all(), ['sort' => 'first_name', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}">
+                            First Name
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{{ route('employees.index', array_merge(request()->all(), ['sort' => 'last_name', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}">
+                            Last Name
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{{ route('employees.index', array_merge(request()->all(), ['sort' => 'email', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}">
+                            Email
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{{ route('employees.index', array_merge(request()->all(), ['sort' => 'phone', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}">
+                            Phone
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{{ route('employees.index', array_merge(request()->all(), ['sort' => 'company', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}">
+                            Company
+                        </a>
+                    </th>
+                    <th style="width: 12%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($employees as $employee)
+                <tr class="{{ $employee->trashed() ? 'table-danger' : '' }}">
+                    <td>{{ $employee->first_name }}</td>
+                    <td>{{ $employee->last_name }}</td>
+                    <td>{{ $employee->email }}</td>
+                    <td>{{ $employee->phone }}</td>
+                    <td>{{ $employee->company->name ?? 'N/A' }}</td>
+                    <td>
+                        <div class="d-flex flex-column align-items-start">
+                            @if($employee->trashed())
+                                <div class="mb-2">
+                                    <form action="{{ route('employees.restore', $employee->id) }}" method="POST">
+                                        @csrf
+                                        @method('PUT')
+                                        <button type="submit" class="btn btn-success btn-sm">Restore</button>
+                                    </form>
+                                </div>
+                                <div class="mb-2">
+                                    <form action="{{ route('employees.forceDelete', $employee->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to permanently delete this employee?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm">Force Delete</button>
+                                    </form>
+                                </div>
+                            @else
+                                <div class="mb-2">
+                                    <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-info btn-sm">Edit</a>
+                                </div>
+                                <div>
+                                    <form action="{{ route('employees.destroy', $employee->id) }}" method="POST" onsubmit="return confirmDelete()">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    </form>
+                                </div>
+                            @endif
+                        </div>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    
 
     <!-- Pagination -->
     <nav aria-label="Page navigation">
@@ -140,7 +156,6 @@
 
 <script>
     function toggleIncludeTrashed() {
-        
         var includeTrashedCheckbox = document.getElementById('include_trashed');
         var includeDeletedButton = document.getElementById('includeDeletedButton');
         

@@ -24,7 +24,6 @@ class EmployeeController extends Controller
 
     public function index(Request $request)
 {
-    
     $breadcrumbs = [
         ['name' => 'Home', 'url' => route('home')],
         ['name' => 'Employees', 'url' => route('employees.index')],
@@ -34,24 +33,23 @@ class EmployeeController extends Controller
     $perPage = $request->input('per_page', 10);
     $query = Employee::query();
 
-    
-
-    // get user's linked company
+    // Get current user
     $user = Auth::user();
+    $isAdmin = $user->is_admin; // Check if the user is an admin
     $companyId = $user->company_id;
 
-    
-
-    // show only employees which belongs to company
-    $query->where('company_id', $companyId);
+    // Show all employees if the user is an admin, otherwise filter by the user's company
+    if (!$isAdmin) {
+        $query->where('company_id', $companyId);
+    }
 
     if ($request->input('include_trashed') == 'on') {
         $query->withTrashed();
     }
 
     if ($request->has('query')) {
-        $query->where(function ($subQuery) use ($request) {
-            $searchTerm = '%' . $request->input('query') . '%';
+        $searchTerm = '%' . $request->input('query') . '%';
+        $query->where(function ($subQuery) use ($searchTerm) {
             $subQuery->where('first_name', 'like', $searchTerm)
                      ->orWhere('last_name', 'like', $searchTerm)
                      ->orWhere('email', 'like', $searchTerm)
@@ -73,10 +71,17 @@ class EmployeeController extends Controller
         $query->orderBy($sort, $direction);
     }
 
-    $employees = $query->paginate($perPage);
+    $employees = $query->paginate($perPage)->appends([
+        'query' => $request->input('query'),
+        'include_trashed' => $request->input('include_trashed'),
+        'sort' => $sort,
+        'direction' => $direction,
+        'per_page' => $perPage,
+    ]);
 
     return view('employees.index', compact('employees', 'perPageOptions', 'perPage', 'sort', 'direction', 'breadcrumbs'));
 }
+
 
 
     public function create()

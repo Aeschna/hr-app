@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\UserController;
 
 // Home route
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -28,13 +29,29 @@ Route::middleware('auth')->group(function() {
 
        // Form creation route (not typically resourceful, ensure it's needed)
     Route::get('/companies/create', [CompanyController::class, 'create'])->name('companies.create');
-    });
+   
+    //User Page Admin Only Routes
+    // routes/web.php
+
+    Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
+    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+    Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+
+
+
+
+
+});
 Route::resource('employees', EmployeeController::class);
     // User-only routes
     //Route::resource('companies', CompanyController::class)->only(['index', 'show']);
     Route::resource('employees', EmployeeController::class)->only(['index', 'show']);
     Route::get('/employees/create', [EmployeeController::class, 'create'])->name('employees.create');
     
+   //User Page Route
+   Route::get('/users', [UserController::class, 'index'])->name('users.index'); 
     
     // My Account route
     Route::get('/my-account', [AccountController::class, 'index'])->name('my-account');
@@ -55,10 +72,12 @@ Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 // Soft Delete Restore routes
 Route::put('companies/{id}/restore', [CompanyController::class, 'restore'])->name('companies.restore');
 Route::put('employees/{id}/restore', [EmployeeController::class, 'restore'])->name('employees.restore');
+Route::put('users/{id}/restore', [UserController::class, 'restore'])->name('users.restore');
 
 // Force delete
 Route::delete('/employees/{id}/force-delete', [EmployeeController::class, 'forceDelete'])->name('employees.forceDelete');
 Route::delete('/companies/{id}/force-delete', [CompanyController::class, 'forceDelete'])->name('companies.forceDelete');
+Route::delete('/users/{id}/force-delete', [UserController::class, 'forcedelete'])->name('users.forceDelete');
 
 // Password Reset Routes
 Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
