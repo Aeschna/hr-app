@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('activity_logs', function (Blueprint $table) {
             $table->id();
-            $table->string('type'); // Added, Deleted, Restored
-            $table->string('model_type'); // Company, Employee
+            $table->string('type');
+            $table->string('model_type');
             $table->unsignedBigInteger('model_id');
             $table->timestamps();
+            $table->softDeletes(); // Add this line to support soft deletes
         });
         
     }
