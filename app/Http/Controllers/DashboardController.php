@@ -35,12 +35,18 @@ class DashboardController extends Controller
                                     ->whereIn('model_id', $employeeIds);
                           });
                 });
+
+                // Count employees in the user's associated company
+                $userEmployeeCount = Employee::where('company_id', $companyId)
+                                              ->count();
+            } else {
+                $userEmployeeCount = 0; // Admins see all employees, so this count is not used
             }
 
             $recentActivities = $recentActivitiesQuery->take(10)->get();
             $alertCount = 0; 
 
-            return view('dashboard', compact('companyCount', 'employeeCount', 'userCount', 'recentActivities', 'alertCount'));
+            return view('dashboard', compact('companyCount', 'employeeCount', 'userCount', 'recentActivities', 'alertCount', 'userEmployeeCount'));
         } else {
             return redirect()->route('login'); 
         }

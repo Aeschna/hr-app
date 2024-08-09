@@ -18,37 +18,48 @@
             </div>
 
             <!-- Statistics -->
-            <div class="row mt-4">
-                <!-- Companies Count -->
-                <div class="col-md-4">
-                    <div class="card bg-primary text-white mb-3">
-                        <div class="card-header">Companies</div>
-                        <div class="card-body">
-                            <h2 class="card-title">{{ $companyCount }}</h2>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Users Count -->
-                <div class="col-md-4">
-                    <div class="card bg-success text-white mb-3">
-                        <div class="card-header">Users</div>
-                        <div class="card-body">
-                            <h2 class="card-title">{{ $userCount }}</h2>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Employees Count -->
-                <div class="col-md-4">
-                    <div class="card bg-info text-white mb-3">
-                        <div class="card-header">Employees</div>
-                        <div class="card-body">
-                            <h2 class="card-title">{{ $employeeCount }}</h2>
-                        </div>
-                    </div>
-                </div>
+<div class="row mt-4">
+    <!-- Companies Count -->
+    <div class="col-md-3">
+        <div class="card bg-primary text-white mb-3">
+            <div class="card-header">Companies</div>
+            <div class="card-body">
+                <h2 class="card-title">{{ $companyCount }}</h2>
             </div>
+        </div>
+    </div>
+
+    <!-- Users Count -->
+    <div class="col-md-3">
+        <div class="card bg-success text-white mb-3">
+            <div class="card-header">Users</div>
+            <div class="card-body">
+                <h2 class="card-title">{{ $userCount }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Employees Count -->
+    <div class="col-md-3">
+        <div class="card bg-info text-white mb-3">
+            <div class="card-header">Employees</div>
+            <div class="card-body">
+                <h2 class="card-title">{{ $employeeCount }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Your Employees -->
+    <div class="col-md-3">
+        <div class="card bg-warning text-white mb-3">
+            <div class="card-header">Your Employees</div>
+            <div class="card-body">
+                <h2 class="card-title">{{ $userEmployeeCount }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
 
             <!-- Recent Activities -->
             <div class="card mb-4">
