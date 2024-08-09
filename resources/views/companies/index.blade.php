@@ -68,7 +68,7 @@
                 <td>{{ $company->email }}</td>
                 <td>
                     @if($company->logo)
-                        <img src="{{ asset('storage/' . $company->logo) }}" alt="Company Logo" width="50">
+                        <img src="{{ asset('storage/' . $company->logo) }}" alt="Company Logo" class="img-fluid rounded mx-auto d-block" style="max-width: 100px; max-height: 100px;">
                     @else
                         N/A
                     @endif
