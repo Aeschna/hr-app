@@ -29,25 +29,27 @@
         </div>
     </form>
 
-    <!-- Dropdown Button for Results Per Page and Include Deleted Button -->
     <form id="resultsPerPageForm" action="{{ route('employees.index') }}" method="GET" class="form-inline mb-3">
-        <div class="form-group mr-3">
-            <label for="per_page" class="mr-2">Results per page:</label>
-            <select name="per_page" id="per_page" class="form-control" onchange="this.form.submit()">
-                @foreach($perPageOptions as $option)
-                    <option value="{{ $option }}" {{ $perPage == $option ? 'selected' : '' }}>{{ $option }}</option>
-                @endforeach
-            </select>
-        </div>
+    <div class="form-group mr-3">
+        <label for="per_page" class="mr-2">Results per page:</label>
+        <select name="per_page" id="per_page" class="form-control" onchange="this.form.submit()">
+            @foreach($perPageOptions as $option)
+                <option value="{{ $option }}" {{ $perPage == $option ? 'selected' : '' }}>{{ $option }}</option>
+            @endforeach
+        </select>
+    </div>
 
-        <!-- Hidden Checkbox for Including Trashed Records -->
-        <input type="hidden" name="include_trashed" id="include_trashed" value="{{ request('include_trashed', 'off') }}">
+    <!-- Hidden Input for Include Trashed -->
+    <input type="hidden" name="include_trashed" id="include_trashed" value="{{ request('include_trashed', 'off') }}">
 
-        <!-- Button to Apply Include Deleted -->
-        <button type="button" id="includeDeletedButton" class="btn {{ request('include_trashed') == 'on' ? 'btn-dark' : 'btn-secondary' }} ml-3" onclick="toggleIncludeTrashed()">
-            Include Deleted
-        </button>
-    </form>
+    <!-- Buttons to Toggle Include Trashed -->
+    <button type="button" id="includeDeletedButton" class="btn {{ request('include_trashed') === 'only_trashed' ? 'btn-secondary' : (request('include_trashed') === 'on' ? 'btn-info' : 'btn-dark') }} ml-3">
+        {{ request('include_trashed') === 'only_trashed' ? 'Show All' : (request('include_trashed') === 'on' ? 'Only Deleted' : 'Include Deleted') }}
+    </button>
+</form>
+
+
+
 
     @if (request()->has('query'))
         <a href="{{ route('employees.index') }}" class="btn btn-secondary mb-3">Back to Employees</a>
@@ -155,21 +157,51 @@
 </div>
 
 <script>
-    function toggleIncludeTrashed() {
-        var includeTrashedCheckbox = document.getElementById('include_trashed');
+    document.addEventListener('DOMContentLoaded', function() {
         var includeDeletedButton = document.getElementById('includeDeletedButton');
-        
-        // Toggle the include_trashed value
-        includeTrashedCheckbox.value = includeTrashedCheckbox.value === 'on' ? 'off' : 'on';
-        
-        // Toggle button classes
-        includeDeletedButton.classList.toggle('btn-dark');
-        includeDeletedButton.classList.toggle('btn-secondary');
-        
-        // Submit the form
-        var form = document.getElementById('resultsPerPageForm');
-        form.submit();
-    }
+        var includeTrashedCheckbox = document.getElementById('include_trashed');
+
+        // Update the button's state based on the current 'include_trashed' value
+        updateButton(includeTrashedCheckbox.value);
+
+        includeDeletedButton.addEventListener('click', function() {
+            var currentState = includeTrashedCheckbox.value;
+
+            // Determine the new state
+            var newState;
+            if (currentState === 'off') {
+                newState = 'on'; // Show deleted and active
+            } else if (currentState === 'on') {
+                newState = 'only_trashed'; // Show only deleted
+            } else {
+                newState = 'off'; // Back to normal
+            }
+
+            // Update the checkbox and button state
+            includeTrashedCheckbox.value = newState;
+            updateButton(newState);
+
+            // Submit the form
+            var form = document.getElementById('resultsPerPageForm');
+            form.submit();
+        });
+
+        function updateButton(state) {
+            if (state === 'off') {
+                includeDeletedButton.textContent = 'Include Deleted';
+                includeDeletedButton.classList.remove('btn-info', 'btn-secondary');
+                includeDeletedButton.classList.add('btn-dark');
+            } else if (state === 'on') {
+                includeDeletedButton.textContent = 'Only Deleted';
+                includeDeletedButton.classList.remove('btn-dark', 'btn-secondary');
+                includeDeletedButton.classList.add('btn-info');
+            } else if (state === 'only_trashed') {
+                includeDeletedButton.textContent = 'Show All';
+                includeDeletedButton.classList.remove('btn-dark', 'btn-info');
+                includeDeletedButton.classList.add('btn-secondary');
+            }
+        }
+    });
 
     document.getElementById('searchForm').onsubmit = function(event) {
         event.preventDefault();
@@ -181,6 +213,8 @@
         // Preserve the include_trashed state in the URL
         if (includeTrashed === 'on') {
             searchUrl += `&include_trashed=on`;
+        } else if (includeTrashed === 'only_trashed') {
+            searchUrl += `&include_trashed=only_trashed`;
         }
 
         window.location.href = searchUrl;
@@ -190,5 +224,8 @@
         return confirm('Are you sure you want to delete this employee?');
     }
 </script>
+
+
+
 
 @endsection

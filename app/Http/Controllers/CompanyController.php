@@ -20,46 +20,49 @@ class CompanyController extends Controller
     }
 
     public function index(Request $request)
-    {
-        // Breadcrumb datas
-        $breadcrumbs = [
-            ['name' => 'Home', 'url' => route('home')],
-            ['name' => 'Companies', 'url' => route('companies.index')],
-        ];
-    
-        $perPageOptions = [10, 50, 100];
-        $perPage = $request->input('per_page', 10);
-        $query = Company::query();
-    
-        if ($request->input('include_trashed') == 'on') {
-            $query->withTrashed();
-        }
-    
-        if ($request->has('query')) {
-            $searchTerm = '%' . $request->input('query') . '%';
-            $query->where(function ($subQuery) use ($searchTerm) {
-                $subQuery->where('name', 'like', $searchTerm)
-                         ->orWhere('address', 'like', $searchTerm)
-                         ->orWhere('phone', 'like', $searchTerm)
-                         ->orWhere('email', 'like', $searchTerm)
-                         ->orWhere('website', 'like', $searchTerm);
-            });
-        }
-    
-        $sort = $request->input('sort', 'name');
-        $direction = $request->input('direction', 'asc');
-        $query->orderBy($sort, $direction);
-    
-        $companies = $query->paginate($perPage)->appends([
-            'query' => $request->input('query'),
-            'include_trashed' => $request->input('include_trashed'),
-            'sort' => $sort,
-            'direction' => $direction,
-            'per_page' => $perPage,
-        ]);
-    
-        return view('companies.index', compact('companies', 'perPageOptions', 'perPage', 'sort', 'direction', 'breadcrumbs'));
+{
+    // Breadcrumb data
+    $breadcrumbs = [
+        ['name' => 'Home', 'url' => route('home')],
+        ['name' => 'Companies', 'url' => route('companies.index')],
+    ];
+
+    $perPageOptions = [10, 50, 100];
+    $perPage = $request->input('per_page', 10);
+    $query = Company::query();
+
+    if ($request->input('include_trashed') === 'only_trashed') {
+        $query->onlyTrashed();
+    } elseif ($request->input('include_trashed') === 'on') {
+        $query->withTrashed();
     }
+
+    if ($request->has('query')) {
+        $searchTerm = '%' . $request->input('query') . '%';
+        $query->where(function ($subQuery) use ($searchTerm) {
+            $subQuery->where('name', 'like', $searchTerm)
+                     ->orWhere('address', 'like', $searchTerm)
+                     ->orWhere('phone', 'like', $searchTerm)
+                     ->orWhere('email', 'like', $searchTerm)
+                     ->orWhere('website', 'like', $searchTerm);
+        });
+    }
+
+    $sort = $request->input('sort', 'name');
+    $direction = $request->input('direction', 'asc');
+    $query->orderBy($sort, $direction);
+
+    $companies = $query->paginate($perPage)->appends([
+        'query' => $request->input('query'),
+        'include_trashed' => $request->input('include_trashed'),
+        'sort' => $sort,
+        'direction' => $direction,
+        'per_page' => $perPage,
+    ]);
+
+    return view('companies.index', compact('companies', 'perPageOptions', 'perPage', 'sort', 'direction', 'breadcrumbs'));
+}
+
     
 
     public function create()

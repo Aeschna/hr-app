@@ -43,10 +43,15 @@ class EmployeeController extends Controller
         $query->where('company_id', $companyId);
     }
 
-    if ($request->input('include_trashed') == 'on') {
+    // Handle 'include_trashed' parameter
+    $includeTrashed = $request->input('include_trashed');
+    if ($includeTrashed === 'only_trashed') {
+        $query->onlyTrashed();
+    } elseif ($includeTrashed === 'on') {
         $query->withTrashed();
     }
 
+    // Handle search query
     if ($request->has('query')) {
         $searchTerm = '%' . $request->input('query') . '%';
         $query->where(function ($subQuery) use ($searchTerm) {
@@ -60,6 +65,7 @@ class EmployeeController extends Controller
         });
     }
 
+    // Handle sorting
     $sort = $request->input('sort', 'first_name');
     $direction = $request->input('direction', 'asc');
 
@@ -71,9 +77,10 @@ class EmployeeController extends Controller
         $query->orderBy($sort, $direction);
     }
 
+    // Paginate results
     $employees = $query->paginate($perPage)->appends([
         'query' => $request->input('query'),
-        'include_trashed' => $request->input('include_trashed'),
+        'include_trashed' => $includeTrashed,
         'sort' => $sort,
         'direction' => $direction,
         'per_page' => $perPage,
@@ -81,6 +88,8 @@ class EmployeeController extends Controller
 
     return view('employees.index', compact('employees', 'perPageOptions', 'perPage', 'sort', 'direction', 'breadcrumbs'));
 }
+
+    
 
 
 

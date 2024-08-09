@@ -19,25 +19,27 @@
         </div>
     </form>
 
-    <!-- Dropdown Button for Results Per Page and Include Deleted Button -->
-    <form id="resultsPerPageForm" action="{{ route('companies.index') }}" method="GET" class="form-inline mb-3">
-        <label for="per_page" class="mr-2">Results per page: </label>
-        <select name="per_page" id="per_page" class="form-control" onchange="this.form.submit()">
-            @foreach($perPageOptions as $option)
-                <option value="{{ $option }}" {{ $perPage == $option ? 'selected' : '' }}>{{ $option }}</option>
-            @endforeach
-        </select>
+   <!-- Dropdown Button for Results Per Page and Include Deleted Button -->
+<form id="resultsPerPageForm" action="{{ route('companies.index') }}" method="GET" class="form-inline mb-3">
+    <label for="per_page" class="mr-2">Results per page: </label>
+    <select name="per_page" id="per_page" class="form-control" onchange="this.form.submit()">
+        @foreach($perPageOptions as $option)
+            <option value="{{ $option }}" {{ $perPage == $option ? 'selected' : '' }}>{{ $option }}</option>
+        @endforeach
+    </select>
 
-        <!-- Hidden Checkbox for Including Trashed Records -->
-        <div class="form-check ml-3" style="display: none;">
-            <input type="checkbox" class="form-check-input" id="include_trashed" name="include_trashed" {{ request('include_trashed') == 'on' ? 'checked' : '' }}>
-        </div>
+    <!-- Hidden Checkbox for Including Trashed Records -->
+    <input type="hidden" name="include_trashed" id="include_trashed" value="{{ request('include_trashed', 'off') }}">
 
-        <!-- Button to Apply Include Deleted -->
-        <button type="button" id="includeDeletedButton"
-            class="btn {{ request('include_trashed') == 'on' ? 'btn-dark' : 'btn-secondary' }} ml-3"
-            onclick="toggleIncludeTrashed()">Include Deleted</button>
-    </form>
+    <!-- Button to Apply Include Deleted -->
+    <button type="button" id="includeDeletedButton"
+        class="btn {{ request('include_trashed') === 'only_trashed' ? 'btn-info' : (request('include_trashed') === 'on' ? 'btn-dark' : 'btn-secondary') }} ml-3"
+        onclick="toggleIncludeTrashed()">
+        {{ request('include_trashed') === 'only_trashed' ? 'Show All' : (request('include_trashed') === 'on' ? 'Only Deleted' : 'Include Deleted') }}
+    </button>
+</form>
+
+
 
     @if (request()->has('query'))
         <a href="{{ route('companies.index') }}" class="btn btn-secondary mb-3">Back to Companies</a>
@@ -63,7 +65,7 @@
         </thead>
         <tbody>
             @foreach ($companies as $company)
-            <tr class="{{ $company->trashed() ? 'trashed' : '' }}">
+            <tr class="{{ $company->trashed() ? 'table-danger' : '' }}">
                 <td>{{ $company->name }}</td>
                 <td>{{ $company->email }}</td>
                 <td>
@@ -127,11 +129,27 @@
 <script>
     function toggleIncludeTrashed() {
         var form = document.getElementById('resultsPerPageForm');
-        var includeTrashedCheckbox = document.getElementById('include_trashed');
+        var includeTrashedInput = document.getElementById('include_trashed');
         var includeDeletedButton = document.getElementById('includeDeletedButton');
-        includeTrashedCheckbox.checked = !includeTrashedCheckbox.checked;
-        includeDeletedButton.classList.toggle('btn-dark');
-        includeDeletedButton.classList.toggle('btn-secondary');
+
+        // Determine the current state and toggle to the next state
+        if (includeTrashedInput.value === 'off') {
+            includeTrashedInput.value = 'on';
+            includeDeletedButton.classList.remove('btn-secondary');
+            includeDeletedButton.classList.add('btn-dark');
+            includeDeletedButton.textContent = 'Only Deleted';
+        } else if (includeTrashedInput.value === 'on') {
+            includeTrashedInput.value = 'only_trashed';
+            includeDeletedButton.classList.remove('btn-dark');
+            includeDeletedButton.classList.add('btn-info');
+            includeDeletedButton.textContent = 'Show All';
+        } else {
+            includeTrashedInput.value = 'off';
+            includeDeletedButton.classList.remove('btn-info');
+            includeDeletedButton.classList.add('btn-secondary');
+            includeDeletedButton.textContent = 'Include Deleted';
+        }
+
         form.submit();
     }
 
@@ -139,12 +157,12 @@
         event.preventDefault();
         var query = this.query.value;
         var perPage = document.getElementById('per_page').value;
-        var includeTrashed = document.getElementById('include_trashed').checked ? 'on' : 'off';
+        var includeTrashed = document.getElementById('include_trashed').value;
         var searchUrl = `{{ route('companies.index') }}?per_page=${perPage}&query=${encodeURIComponent(query)}`;
 
         // Preserve the include_trashed state in the URL
-        if (includeTrashed === 'on') {
-            searchUrl += `&include_trashed=on`;
+        if (includeTrashed) {
+            searchUrl += `&include_trashed=${includeTrashed}`;
         }
 
         window.location.href = searchUrl;
@@ -154,5 +172,6 @@
         return confirm('Are you sure you want to delete this company?');
     }
 </script>
+
 
 @endsection
