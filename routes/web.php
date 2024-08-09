@@ -11,8 +11,9 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
+
 // Home route
-//Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/', [DashboardController::class, 'index'])->name('home');
 
 // Search routes
 Route::get('/companies/search', [CompanyController::class, 'search'])->name('companies.search');
@@ -20,49 +21,37 @@ Route::get('/employees/search', [EmployeeController::class, 'search'])->name('em
 
 // Middleware group for authenticated users
 Route::middleware('auth')->group(function() {
-    // Admin-only routes (ensure admin middleware is properly defined)
+    // Admin-only routes
     Route::middleware('admin')->group(function() {
         Route::resource('companies', CompanyController::class);
-        
         Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
-       // Route::get('/companies', [CompanyController::class, 'index'])->name('companies.index');
+        Route::get('/companies/create', [CompanyController::class, 'create'])->name('companies.create');
 
-       // Form creation route (not typically resourceful, ensure it's needed)
-    Route::get('/companies/create', [CompanyController::class, 'create'])->name('companies.create');
-   
-    //User Page Admin Only Routes
-    // routes/web.php
+        // User Page Admin Only Routes
+        Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
+        Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+        Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+        Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+    });
 
-    Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
-    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
-    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
-    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
-    Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
-
-
-
-
-
-});
-Route::resource('employees', EmployeeController::class);
-    // User-only routes
-    //Route::resource('companies', CompanyController::class)->only(['index', 'show']);
-    Route::resource('employees', EmployeeController::class)->only(['index', 'show']);
+    // Resource routes for employees with custom routes
+    Route::resource('employees', EmployeeController::class);
     Route::get('/employees/create', [EmployeeController::class, 'create'])->name('employees.create');
     
-   //User Page Route
-   Route::get('/users', [UserController::class, 'index'])->name('users.index'); 
-    
+    // User Page Route
+    Route::get('/users', [UserController::class, 'index'])->name('users.index'); 
+
     // My Account route
     Route::get('/my-account', [AccountController::class, 'index'])->name('my-account');
-    // My Account update route
     Route::put('/my-account', [AccountController::class, 'update'])->name('account.update');
-    
+
     // Change Password Routes
     Route::get('/password/change', [AccountController::class, 'showChangePasswordForm'])->name('password.change');
     Route::put('/password/change', [AccountController::class, 'changePassword'])->name('password.update');
-
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // Dashboard route (ensure it is accessible only to authenticated users)
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
 // Authentication routes
@@ -86,5 +75,3 @@ Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestF
 Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
 Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
-
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
