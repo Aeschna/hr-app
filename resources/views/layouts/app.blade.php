@@ -4,10 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HR App</title>
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    
+    <!-- Vite tarafından işlenen CSS ve JS dosyaları -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
+    <!-- Diğer dış kütüphaneler -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-    <!-- Place additional stylesheets or scripts here -->
+    
+
+    @auth
+        <script>
+            window.api_token = '{{ auth()->user()->api_token  }}'
+        </script>
+    @endauth
+
+
+    <!-- Başka stiller veya scriptler ekleyin -->
 </head>
 <body>
     
@@ -115,5 +128,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <!-- Place additional scripts here -->
+
+@vite('resources/js/app.js')
 </body>
 </html>

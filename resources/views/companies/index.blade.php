@@ -3,8 +3,14 @@
 @section('content')
 
 <head>
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <!-- Vite tarafından işlenen CSS ve JS dosyaları -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+
+<div id="app">
+        <!-- Vue.js uygulamanız burada yüklenecek -->
+        <companies-list></companies-list> <!-- Vue bileşeniniz burada kullanılıyor olabilir -->
+    </div>
 <div class="container">
     <h2>Companies</h2>
     <a href="{{ route('companies.create') }}" class="btn btn-primary">Add Company</a>

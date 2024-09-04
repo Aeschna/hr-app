@@ -190,4 +190,12 @@ class UserController extends Controller
        
         return redirect()->route('users.index')->with('status', 'User restored successfully.');
     }
+    public function getAuthenticatedUser()
+{
+    return response()->json([
+        'company' => auth()->user()->company,
+        'isAdmin' => auth()->user()->isAdmin(),
+    ]);
+}
+
 }

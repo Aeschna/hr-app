@@ -1,6 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
+<head>
+@vite('public/css/app.css')
+</head>
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-12">
@@ -76,6 +79,12 @@
                     </ul>
                 </div>
             </div>
+<!-- Vue -->
+<div id="app"></div>
+
+@vite('resources/js/app.js')
+
+
 
             <!-- Alerts -->
             <div class="card mb-4">

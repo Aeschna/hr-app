@@ -12,6 +12,8 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
 
+
+//Route::view('{any}','app')->where('any','*');
 // Home route
 Route::get('/', [DashboardController::class, 'index'])->name('home');
 
@@ -74,4 +76,4 @@ Route::delete('/users/{id}/force-delete', [UserController::class, 'forcedelete']
 Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
 Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
+Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.reset.submit');

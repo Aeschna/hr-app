@@ -6,6 +6,12 @@
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 </head>
 
+<div id="app2">
+        <!-- Vue.js uygulamanız burada yüklenecek -->
+        <employees-list></employees-list> <!-- Vue bileşeniniz burada kullanılıyor olabilir -->
+    </div>
+
+
 <div class="container">
     <!-- Display company name only if the user is not an admin -->
     @if (!auth()->user()->isAdmin())
