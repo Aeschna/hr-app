@@ -4,7 +4,8 @@
     "scripts": {
         "dev": "vite",
         "build": "vite build",
-        "phpcs:fix": "vendor/bin/php-cs-fixer fix"
+        "phpcs:fix": "vendor/bin/php-cs-fixer fix",
+        "larastan": "vendor/bin/phpstan analyse --memory-limit=2G"
     },
     "devDependencies": {
         "@popperjs/core": "^2.11.6",
