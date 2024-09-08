@@ -3,7 +3,8 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "vite build"
+        "build": "vite build",
+        "phpcs:fix": "vendor/bin/php-cs-fixer fix"
     },
     "devDependencies": {
         "@popperjs/core": "^2.11.6",
@@ -19,6 +20,7 @@
     },
     "dependencies": {
         "cors": "^2.8.5",
+        "form-backend-validation": "^2.4.0",
         "pinia": "^2.2.2",
         "vue": "^3.4.38",
         "vue-router": "^4.0.13"

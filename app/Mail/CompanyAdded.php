@@ -20,8 +20,8 @@ class CompanyAdded extends Mailable
     public function build()
     {
         return $this->view('emails.company_added') // Doğru görünüm adı
-                    ->with([
-                       'companyName' => $this->company->name,
-                    ]);
+            ->with([
+               'companyName' => $this->company->name,
+            ]);
     }
 }

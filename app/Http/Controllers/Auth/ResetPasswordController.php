@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\PasswordChanged;
 use Illuminate\Foundation\Auth\ResetsPasswords;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Redirect;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\PasswordChanged;
+use Illuminate\Support\Facades\Redirect;
 
 class ResetPasswordController extends Controller
 {
@@ -25,13 +25,15 @@ class ResetPasswordController extends Controller
     /**
      * Get the response for a successful password reset.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @param Request $request
+     *
+     * @return RedirectResponse
      */
     protected function sendResetResponse(Request $request, $response): RedirectResponse
     {
         $user = Auth::user();
         Mail::to($user->email)->send(new PasswordChanged($user));
+
         return Redirect::to($this->redirectTo)
             ->with('status', 'Your password has been reset successfully!');
     }

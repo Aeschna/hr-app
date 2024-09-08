@@ -15,14 +15,15 @@ use App\Http\Controllers\DashboardController;
 
 //Route::view('{any}','app')->where('any','*');
 // Home route
-Route::get('/', [DashboardController::class, 'index'])->name('home');
 
 // Search routes
 Route::get('/companies/search', [CompanyController::class, 'search'])->name('companies.search');
 Route::get('/employees/search', [EmployeeController::class, 'search'])->name('employees.search');
 
 // Middleware group for authenticated users
-Route::middleware('auth')->group(function() {
+Route::middleware('auth:web')->group(function() {
+    Route::get('/', [DashboardController::class, 'index'])->name('home');
+
     // Admin-only routes
     Route::middleware('admin')->group(function() {
         Route::resource('companies', CompanyController::class);
@@ -40,9 +41,9 @@ Route::middleware('auth')->group(function() {
     // Resource routes for employees with custom routes
     Route::resource('employees', EmployeeController::class);
     Route::get('/employees/create', [EmployeeController::class, 'create'])->name('employees.create');
-    
+
     // User Page Route
-    Route::get('/users', [UserController::class, 'index'])->name('users.index'); 
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
 
     // My Account route
     Route::get('/my-account', [AccountController::class, 'index'])->name('my-account');
@@ -51,7 +52,7 @@ Route::middleware('auth')->group(function() {
     // Change Password Routes
     Route::get('/password/change', [AccountController::class, 'showChangePasswordForm'])->name('password.change');
     Route::put('/password/change', [AccountController::class, 'changePassword'])->name('password.update');
-    
+
     // Dashboard route (ensure it is accessible only to authenticated users)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });

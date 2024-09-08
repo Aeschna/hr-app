@@ -18,13 +18,13 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->foreignId('company_id')->nullable()->constrained()->onDelete('set null');
+            $table->string('api_token', 80)
+                ->unique()
+                ->nullable()
+                ->default(null);
             $table->rememberToken();
             $table->timestamps();
-            $table->softDeletes(); 
-            $table->string('api_token', 80)
-            ->unique()
-            ->nullable()
-            ->default(null);
+            $table->softDeletes();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

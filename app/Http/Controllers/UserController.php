@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\UserRequest; // İlgili Request sınıfı oluşturulmalı
-use App\Models\User;
+// İlgili Request sınıfı oluşturulmalı
 use App\Models\Company;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
-
 
 class UserController extends Controller
 {
@@ -25,12 +23,12 @@ class UserController extends Controller
         ];
 
         $perPageOptions = [10, 50, 100];
-        $perPage = $request->input('per_page', 10);
-        $query = User::query();
+        $perPage        = $request->input('per_page', 10);
+        $query          = User::query();
 
         // Get current user
-        $user = Auth::user();
-        $isAdmin = $user->is_admin; // Check if the user is an admin
+        $user      = Auth::user();
+        $isAdmin   = $user->is_admin; // Check if the user is an admin
         $companyId = $user->company_id;
 
         // Show all users if the user is an admin, otherwise filter by the user's company
@@ -44,23 +42,23 @@ class UserController extends Controller
 
         if ($request->has('query')) {
             $searchTerm = '%' . $request->input('query') . '%';
-            $query->where(function ($subQuery) use ($searchTerm) {
+            $query->where(function($subQuery) use ($searchTerm) {
                 $subQuery->where('name', 'like', $searchTerm)
-                         ->orWhere('email', 'like', $searchTerm);
+                    ->orWhere('email', 'like', $searchTerm);
             });
         }
 
-        $sort = $request->input('sort', 'name');
+        $sort      = $request->input('sort', 'name');
         $direction = $request->input('direction', 'asc');
 
         $query->orderBy($sort, $direction);
 
         $users = $query->paginate($perPage)->appends([
-            'query' => $request->input('query'),
+            'query'           => $request->input('query'),
             'include_trashed' => $request->input('include_trashed'),
-            'sort' => $sort,
-            'direction' => $direction,
-            'per_page' => $perPage,
+            'sort'            => $sort,
+            'direction'       => $direction,
+            'per_page'        => $perPage,
         ]);
 
         return view('users.index', compact('users', 'perPageOptions', 'perPage', 'sort', 'direction', 'breadcrumbs'));
@@ -75,6 +73,7 @@ class UserController extends Controller
         ];
 
         $companies = Company::all();
+
         return view('users.create', compact('companies', 'breadcrumbs'));
     }
 
@@ -82,12 +81,12 @@ class UserController extends Controller
     {
         // Validate the form data
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name'  => 'required|string|max:255',
             'email' => [
                 'required',
                 'email',
                 'unique:users,email',
-                'regex:/^[\w\.-]+@(gmail\.com|hotmail\.com|outlook\.com|yahoo\.com|aol\.com|example\.org|example\.net)$/i'
+                'regex:/^[\w\.-]+@(gmail\.com|hotmail\.com|outlook\.com|yahoo\.com|aol\.com|example\.org|example\.net)$/i',
             ],
             'company_id' => 'required|exists:companies,id',
         ]);
@@ -122,17 +121,18 @@ class UserController extends Controller
         ];
 
         $companies = Company::all();
+
         return view('users.edit', compact('user', 'companies', 'breadcrumbs'));
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name'  => 'required|string|max:255',
             'email' => [
                 'required',
                 'email',
-                'regex:/^[\w\.-]+@(gmail\.com|hotmail\.com|outlook\.com|yahoo\.com|aol\.com|example\.org|example\.net)$/i'
+                'regex:/^[\w\.-]+@(gmail\.com|hotmail\.com|outlook\.com|yahoo\.com|aol\.com|example\.org|example\.net)$/i',
             ],
             'company_id' => 'required|exists:companies,id',
         ]);
@@ -140,8 +140,8 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         $user->update([
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
+            'name'       => $request->input('name'),
+            'email'      => $request->input('email'),
             'company_id' => $request->input('company_id'),
         ]);
 
@@ -190,12 +190,12 @@ class UserController extends Controller
        
         return redirect()->route('users.index')->with('status', 'User restored successfully.');
     }
-    public function getAuthenticatedUser()
-{
-    return response()->json([
-        'company' => auth()->user()->company,
-        'isAdmin' => auth()->user()->isAdmin(),
-    ]);
-}
 
+    public function getAuthenticatedUser()
+    {
+        return response()->json([
+            'company' => auth()->user()->company,
+            'isAdmin' => auth()->user()->isAdmin(),
+        ]);
+    }
 }

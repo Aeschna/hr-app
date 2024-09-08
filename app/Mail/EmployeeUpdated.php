@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Mail;
 
 use App\Models\Employee;
@@ -20,6 +21,6 @@ class EmployeeUpdated extends Mailable
     public function build()
     {
         return $this->view('emails.employee.updated')
-                    ->with('employee', $this->employee);
+            ->with('employee', $this->employee);
     }
 }

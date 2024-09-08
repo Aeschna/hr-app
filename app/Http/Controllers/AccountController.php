@@ -1,12 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Support\Facades\Hash;
+
 use App\Mail\AccountUpdated;
+use App\Mail\PasswordChanged;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\PasswordChanged;
 
 class AccountController extends Controller
 {
@@ -16,9 +17,10 @@ class AccountController extends Controller
     public function index()
     {
         return view('account.index', [
-            'user' => Auth::user()
+            'user' => Auth::user(),
         ]);
     }
+
     public function update(Request $request)
     {
         $user = Auth::user();
@@ -26,11 +28,11 @@ class AccountController extends Controller
         // Update user information
         if ($request->has('name') || $request->has('email')) {
             $request->validate([
-                'name' => 'sometimes|string|max:255',
+                'name'  => 'sometimes|string|max:255',
                 'email' => 'sometimes|email|max:255|unique:users,email,' . $user->id,
             ]);
     
-            $user->name = $request->input('name', $user->name);
+            $user->name  = $request->input('name', $user->name);
             $user->email = $request->input('email', $user->email);
         }
     
@@ -38,7 +40,7 @@ class AccountController extends Controller
         if ($request->filled('current_password') && $request->filled('new_password')) {
             $request->validate([
                 'current_password' => 'required',
-                'new_password' => 'required|min:8|confirmed',
+                'new_password'     => 'required|min:8|confirmed',
             ]);
     
             if (!Hash::check($request->input('current_password'), $user->password)) {
@@ -56,33 +58,31 @@ class AccountController extends Controller
     
         return redirect()->route('my-account')->with('status', 'Account updated successfully.');
     }
-    
 
-
-public function showChangePasswordForm()
-{
-    return view('password.change');
-}
-public function changePassword(Request $request)
-{
-    $user = Auth::user();
-
-    $request->validate([
-        'current_password' => 'required',
-        'new_password' => 'required|min:8|confirmed',
-    ]);
-
-    if (!Hash::check($request->input('current_password'), $user->password)) {
-        return back()->withErrors(['current_password' => 'The current password is incorrect.']);
+    public function showChangePasswordForm()
+    {
+        return view('password.change');
     }
 
-    $user->password = Hash::make($request->input('new_password'));
-    $user->save();
+    public function changePassword(Request $request)
+    {
+        $user = Auth::user();
 
-    // Send email notification
-    Mail::to($user->email)->send(new PasswordChanged($user));
+        $request->validate([
+            'current_password' => 'required',
+            'new_password'     => 'required|min:8|confirmed',
+        ]);
 
-    return redirect()->route('my-account')->with('status', 'Password changed successfully.');
-}
+        if (!Hash::check($request->input('current_password'), $user->password)) {
+            return back()->withErrors(['current_password' => 'The current password is incorrect.']);
+        }
 
+        $user->password = Hash::make($request->input('new_password'));
+        $user->save();
+
+        // Send email notification
+        Mail::to($user->email)->send(new PasswordChanged($user));
+
+        return redirect()->route('my-account')->with('status', 'Password changed successfully.');
+    }
 }

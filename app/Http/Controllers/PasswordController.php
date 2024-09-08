@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class PasswordController extends Controller
@@ -16,14 +16,14 @@ class PasswordController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'current_password' => ['required', 'current_password'],
-            'new_password' => ['required', 'confirmed', 'min:8'],
+            'new_password'     => ['required', 'confirmed', 'min:8'],
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $user = Auth::user();
+        $user           = Auth::user();
         $user->password = Hash::make($request->input('new_password'));
         $user->save();
 

@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CompanyRequest;
+use App\Http\Requests\CompanyStoreFormRequest;
 use App\Mail\CompanyAdded;
 use App\Models\Company;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-
 use Illuminate\Support\Facades\Mail;
 
+use Illuminate\Support\Facades\Storage;
 
 class CompanyController extends Controller
 {
@@ -19,51 +18,49 @@ class CompanyController extends Controller
         $this->middleware('auth');
     }
 
-   public function index(Request $request)
-{
-    // Breadcrumb data
-    $breadcrumbs = [
-        ['name' => 'Home', 'url' => route('home')],
-        ['name' => 'Companies', 'url' => route('companies.index')],
-    ];
+    public function index(Request $request)
+    {
+        // Breadcrumb data
+        $breadcrumbs = [
+            ['name' => 'Home', 'url' => route('home')],
+            ['name' => 'Companies', 'url' => route('companies.index')],
+        ];
 
-    $perPageOptions = [10, 50, 100];
-    $perPage = $request->input('per_page', 10);
-    $query = Company::query();
+        $perPageOptions = [10, 50, 100];
+        $perPage        = $request->input('per_page', 10);
+        $query          = Company::query();
 
-    if ($request->input('include_trashed') === 'only_trashed') {
-        $query->onlyTrashed();
-    } elseif ($request->input('include_trashed') === 'on') {
-        $query->withTrashed();
+        if ($request->input('include_trashed') === 'only_trashed') {
+            $query->onlyTrashed();
+        } elseif ($request->input('include_trashed') === 'on') {
+            $query->withTrashed();
+        }
+
+        if ($request->has('query')) {
+            $searchTerm = '%' . $request->input('query') . '%';
+            $query->where(function($subQuery) use ($searchTerm) {
+                $subQuery->where('name', 'like', $searchTerm)
+                    ->orWhere('address', 'like', $searchTerm)
+                    ->orWhere('phone', 'like', $searchTerm)
+                    ->orWhere('email', 'like', $searchTerm)
+                    ->orWhere('website', 'like', $searchTerm);
+            });
+        }
+
+        $sort      = $request->input('sort', 'name');
+        $direction = $request->input('direction', 'asc');
+        $query->orderBy($sort, $direction);
+
+        $companies = $query->paginate($perPage)->appends([
+            'query'           => $request->input('query'),
+            'include_trashed' => $request->input('include_trashed'),
+            'sort'            => $sort,
+            'direction'       => $direction,
+            'per_page'        => $perPage,
+        ]);
+
+        return view('companies.index', compact('companies', 'perPageOptions', 'perPage', 'sort', 'direction', 'breadcrumbs'));
     }
-
-    if ($request->has('query')) {
-        $searchTerm = '%' . $request->input('query') . '%';
-        $query->where(function ($subQuery) use ($searchTerm) {
-            $subQuery->where('name', 'like', $searchTerm)
-                     ->orWhere('address', 'like', $searchTerm)
-                     ->orWhere('phone', 'like', $searchTerm)
-                     ->orWhere('email', 'like', $searchTerm)
-                     ->orWhere('website', 'like', $searchTerm);
-        });
-    }
-
-    $sort = $request->input('sort', 'name');
-    $direction = $request->input('direction', 'asc');
-    $query->orderBy($sort, $direction);
-
-    $companies = $query->paginate($perPage)->appends([
-        'query' => $request->input('query'),
-        'include_trashed' => $request->input('include_trashed'),
-        'sort' => $sort,
-        'direction' => $direction,
-        'per_page' => $perPage,
-    ]);
-
-    return view('companies.index', compact('companies', 'perPageOptions', 'perPage', 'sort', 'direction', 'breadcrumbs'));
-}
-
-    
 
     public function create()
     {
@@ -73,47 +70,46 @@ class CompanyController extends Controller
             ['name' => 'Create', 'url' => '', 'active' => true],
         ];
         $users = User::all(); // get all users
+
         return view('companies.create', compact('breadcrumbs', 'users'));
     }
 
-    
-   public function store(CompanyRequest $request)
-{
-    $validatedData = $request->validated();
-    
-    // Check if user already has a company
-    $user = User::find($validatedData['user_id']);
-    if ($user->company_id) {
-        return redirect()->back()->withErrors(['user_id' => 'The selected user is already assigned to a company.']);
-    }
+    public function store(CompanyStoreFormRequest $request)
+    {
+        $validatedData = $request->validated();
 
-    $company = new Company();
-    $company->name = $validatedData['name'];
-    $company->address = $validatedData['address'];
-    $company->phone = $validatedData['phone'];
-    $company->email = $validatedData['email'];
-    
-    if ($request->hasFile('logo')) {
-        $logo = $request->file('logo');
-        $logoName = time() . '.' . $logo->getClientOriginalExtension();
-        $logo->storeAs('public/logos', $logoName);
-        $company->logo = 'logos/' . $logoName;
+        // Check if user already has a company
+        $user = User::find($validatedData['user_id']);
+        if ($user->company_id) {
+            return redirect()->back()->withErrors(['user_id' => 'The selected user is already assigned to a company.']);
+        }
+
+        $company          = new Company();
+        $company->name    = $validatedData['name'];
+        $company->address = $validatedData['address'];
+        $company->phone   = $validatedData['phone'];
+        $company->email   = $validatedData['email'];
+
+        if ($request->hasFile('logo')) {
+            $logo     = $request->file('logo');
+            $logoName = time() . '.' . $logo->getClientOriginalExtension();
+            $logo->storeAs('public/logos', $logoName);
+            $company->logo = 'logos/' . $logoName;
+        }
+
+        $company->website = $validatedData['website'];
+
+        if ($request->has('user_id') && $request->user_id) {
+            $company->user_id = $request->user_id;
+        }
+
+        $company->save();
+
+        // Send email notification
+        Mail::to('20comp1013@isik.edu.tr')->send(new CompanyAdded($company));
+
+        return redirect()->route('companies.index')->with('status', 'Company created successfully.');
     }
-    
-    $company->website = $validatedData['website'];
-    
-    if ($request->has('user_id') && $request->user_id) {
-        $company->user_id = $request->user_id;
-    }
-    
-    $company->save();
-    
-    // Send email notification
-    Mail::to('20comp1013@isik.edu.tr')->send(new CompanyAdded($company));
-    
-    return redirect()->route('companies.index')->with('status', 'Company created successfully.');
-}
-    
 
     public function show(Company $company)
     {
@@ -134,59 +130,59 @@ class CompanyController extends Controller
             ['name' => 'Edit', 'url' => '', 'active' => true],
         ];
         $users = User::all(); // get all users
+
         return view('companies.edit', compact('breadcrumbs', 'company', 'users'));
     }
 
     public function update(Request $request, $id)
     {
-        
+
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name'    => 'required|string|max:255',
             'address' => 'nullable|string',
-            'phone' => 'nullable|string|max:20',
-            'email' => 'nullable|email',
+            'phone'   => 'nullable|string|max:20',
+            'email'   => 'nullable|email',
             'website' => 'nullable|url',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'logo'    => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'user_id' => 'nullable|exists:users,id',
         ]);
-    
-        
+
+
         $company = Company::findOrFail($id);
-    
-        
+
+
         if ($request->hasFile('logo')) {
             if ($company->logo) {
                 Storage::delete('public/' . $company->logo);
             }
-    
-            $logo = $request->file('logo');
+
+            $logo     = $request->file('logo');
             $logoName = time() . '.' . $logo->getClientOriginalExtension();
             $logo->storeAs('public/logos', $logoName);
             $logoPath = 'logos/' . $logoName;
         } else {
             $logoPath = $company->logo;
         }
-    
-        
+
+
         $company->update([
-            'name' => $request->input('name'),
+            'name'    => $request->input('name'),
             'address' => $request->input('address'),
-            'phone' => $request->input('phone'),
-            'email' => $request->input('email'),
+            'phone'   => $request->input('phone'),
+            'email'   => $request->input('email'),
             'website' => $request->input('website'),
-            'logo' => $logoPath,
+            'logo'    => $logoPath,
         ]);
 
         // assign user to company
-    if ($request->user_id) {
-        $user = User::find($request->user_id);
-        $user->company_id = $company->id;
-        $user->save();
-    }
-    
+        if ($request->user_id) {
+            $user             = User::find($request->user_id);
+            $user->company_id = $company->id;
+            $user->save();
+        }
+
         return redirect()->route('companies.index')->with('status', 'Company updated successfully!');
     }
-    
 
     public function destroy($id)
     {
@@ -223,6 +219,7 @@ class CompanyController extends Controller
 
         if ($company && $company->trashed()) {
             $company->restore();
+
             return redirect()->route('companies.index')->with('status', 'Company restored successfully.');
         }
 
@@ -231,9 +228,9 @@ class CompanyController extends Controller
 
     public function search(Request $request)
     {
-        $query = $request->input('query');
+        $query          = $request->input('query');
         $perPageOptions = [10, 50, 100];
-        $perPage = $request->input('per_page', 10);
+        $perPage        = $request->input('per_page', 10);
 
         $companies = Company::where('name', 'like', "%$query%")
             ->orWhere('address', 'like', "%$query%")
