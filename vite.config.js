@@ -10,5 +10,5 @@ export default defineConfig({
         }),
         vue(), // Vue 3 plugin'i buraya ekleniyor
     ],
-    
+
 });

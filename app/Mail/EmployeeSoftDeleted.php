@@ -21,6 +21,6 @@ class EmployeeSoftDeleted extends Mailable
     public function build()
     {
         return $this->view('emails.employee.soft_deleted')
-                    ->with('employee', $this->employee);
+            ->with('employee', $this->employee);
     }
 }

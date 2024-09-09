@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Mail;
 
 use App\Models\Employee;
@@ -22,6 +21,6 @@ class EmployeePermanentlyDeleted extends Mailable
     public function build()
     {
         return $this->view('emails.employee.permanently_deleted')
-                    ->with('employee', $this->employee);
+            ->with('employee', $this->employee);
     }
 }

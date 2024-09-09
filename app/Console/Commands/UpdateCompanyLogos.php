@@ -2,12 +2,13 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Company;
+use Illuminate\Console\Command;
 
 class UpdateCompanyLogos extends Command
 {
     protected $signature = 'update:company-logos';
+
     protected $description = 'Update the logo path for all companies';
 
     public function __construct()

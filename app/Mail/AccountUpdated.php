@@ -11,19 +11,22 @@ class AccountUpdated extends Mailable
     use Queueable, SerializesModels;
 
     public $user;
+
     public $passwordChanged;
+
     public $subject;
 
     /**
      * Create a new message instance.
      *
-     * @param $user
+     * @param      $user
      * @param bool $passwordChanged
+     *
      * @return void
      */
     public function __construct($user, $passwordChanged = false)
     {
-        $this->user = $user;
+        $this->user            = $user;
         $this->passwordChanged = $passwordChanged;
 
         if ($passwordChanged) {
@@ -40,11 +43,11 @@ class AccountUpdated extends Mailable
      */
     public function build()
     {
-        $view = $this->passwordChanged 
-        ? 'emails.password_changed' 
+        $view = $this->passwordChanged
+        ? 'emails.password_changed'
         : 'emails.account.updated';
 
-return $this->subject('Your Account Information Has Been Updated')
+        return $this->subject('Your Account Information Has Been Updated')
             ->view($view);
     }
 }

@@ -15,12 +15,11 @@ const token = localStorage.getItem('token');
 console.log(token);
 
 axios.defaults.withCredentials = true; // Send cookies with requests
-axios.defaults.baseURL = 'http://localhost:8000';
+//axios.defaults.baseURL = 'http://localhost:8000';
+axios.defaults.baseURL = 'http://hr-app.test';
 
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 axios.defaults.headers.common['Authorization'] = 'Bearer ' + window.api_token;
-
-
 
 app.use(router);
 

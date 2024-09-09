@@ -17,29 +17,9 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             AdminSeeder::class,
             UserSeeder::class,
-            CompanySeeder::class, 
-            EmployeeSeeder::class, 
+            CompanySeeder::class,
+            EmployeeSeeder::class,
         ]);
-    }
-}
-
-class AdminSeeder extends Seeder
-{
-    public function run(): void
-    {
-        User::factory()->admin()->create([
-            'name' => 'Admin',
-            'email' => 'admin@admin.com',
-            'password' => Hash::make('password'),
-        ]);
-    }
-}
-
-class UserSeeder extends Seeder
-{
-    public function run(): void
-    {
-        User::factory(20)->create(); // Create 10 random employees
     }
 }
 

@@ -21,16 +21,17 @@ class EmployeeRequest extends FormRequest
     {
         return [
             'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => [
+            'last_name'  => 'required|string|max:255',
+            'email'      => [
             'nullable',
             'email',
-            'regex:/^[\w\.-]+@(gmail\.com|hotmail\.com|outlook\.com|yahoo\.com|aol\.com|example\.org|example\.net)$/i'
+            'regex:/^[\w\.-]+@(gmail\.com|hotmail\.com|outlook\.com|yahoo\.com|aol\.com|example\.org|example\.net)$/i',
         ],
-            'phone' => 'required|string|max:15|regex:/^[0-9+\(\)#\.\s\/ext-]+$/',
+            'phone'      => 'required|string|max:15|regex:/^[0-9+\(\)#\.\s\/ext-]+$/',
             'company_id' => 'required|exists:companies,id',
         ];
     }
+
     public function messages(): array
     {
         return [

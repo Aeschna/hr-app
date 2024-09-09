@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Api\CompanyApiController;
+use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
@@ -11,12 +11,12 @@ use App\Http\Controllers\UserController;
 //Route::post('/login', [LoginController::class, 'login']);
 // API routes
 Route::middleware('auth:api')->prefix('companies')->group(function () {
-    Route::get('/', [CompanyApiController::class, 'index']);
-    Route::post('/', [CompanyApiController::class, 'store']);
-    Route::get('/{id}', [CompanyApiController::class, 'show']);
-    Route::put('/{id}', [CompanyApiController::class, 'update']);
-    Route::delete('/{id}', [CompanyApiController::class, 'destroy']);
-    Route::post('/{id}/restore', [CompanyApiController::class, 'restore']);
+    Route::get('/', [CompanyController::class, 'index']);
+    Route::post('/', [CompanyController::class, 'store']);
+    Route::get('{company}', [CompanyController::class, 'show']);
+    Route::put('{company}', [CompanyController::class, 'update']);
+    Route::delete('{company}', [CompanyController::class, 'destroy']);
+    Route::post('{company}/restore', [CompanyController::class, 'restore']);
 });
 
 Route::middleware('auth:api')->group(function () {

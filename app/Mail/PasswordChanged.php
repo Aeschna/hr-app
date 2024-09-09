@@ -1,6 +1,7 @@
 <?php
 
 // app/Mail/PasswordChanged.php
+
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
@@ -21,6 +22,6 @@ class PasswordChanged extends Mailable
     public function build()
     {
         return $this->view('emails.account.password_changed')
-                    ->subject('Your Password Has Been Changed');
+            ->subject('Your Password Has Been Changed');
     }
 }

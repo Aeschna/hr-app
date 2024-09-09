@@ -2,7 +2,7 @@
 
 @section('content')
 <head>
-@vite('public/css/app.css')
+@vite('resources/css/app.css')
 </head>
 <div class="container">
     <div class="row justify-content-center">
