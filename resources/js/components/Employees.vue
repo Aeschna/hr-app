@@ -88,105 +88,134 @@
   </template>
   
   <script>
-  import axios from 'axios';
-  export default {
-    data() {
-      return {
-        employees: [],
-        companyName: '',
-        isAdmin: false,
-        searchQuery: '',
-        perPage: 10,
-        includeTrashed: 'off',
-        pagination: {},
-        perPageOptions: [10, 25, 50],
-        sortField: 'first_name',
-        sortDirection: 'asc',
-      };
+import axios from "axios";
+
+export default {
+  data() {
+    return {
+      employees: [],
+      companyName: "",
+      isAdmin: false,
+      searchQuery: "",
+      perPage: 10,
+      includeTrashed: "off",
+      pagination: {},
+      perPageOptions: [10, 25, 50],
+      sortField: "first_name",
+      sortDirection: "asc",
+    };
+  },
+  created() {
+    this.fetchEmployees();
+  },
+  computed: {
+    trashedButtonText() {
+      if (this.includeTrashed === "off") return "Include Deleted";
+      if (this.includeTrashed === "on") return "Only Deleted";
+      return "Show All";
     },
-    computed: {
-      trashedButtonText() {
-        if (this.includeTrashed === 'off') return 'Include Deleted';
-        if (this.includeTrashed === 'on') return 'Only Deleted';
-        return 'Show All';
-      },
-      trashedButtonClass() {
-        if (this.includeTrashed === 'off') return 'btn-dark';
-        if (this.includeTrashed === 'on') return 'btn-info';
-        return 'btn-secondary';
-      },
+    trashedButtonClass() {
+      if (this.includeTrashed === "off") return "btn-dark";
+      if (this.includeTrashed === "on") return "btn-info";
+      return "btn-secondary";
     },
-    methods: {
-      async fetchEmployees() {
-        const response = await axios.get('/api/employees', {
-          params: {
-            per_page: this.perPage,
-            query: this.searchQuery,
-            include_trashed: this.includeTrashed,
-            sort: this.sortField,
-            direction: this.sortDirection,
-          },
-        });
-        this.employees = response.data.data;
-        this.pagination = response.data.meta;
-      },
-      searchEmployees() {
-        this.fetchEmployees();
-      },
-      changePage(pageUrl) {
-        axios.get(pageUrl).then(response => {
-          this.employees = response.data.data;
-          this.pagination = response.data.meta;
-        });
-      },
-      sortEmployees(field) {
-        if (this.sortField === field) {
-          this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
-        } else {
-          this.sortField = field;
-          this.sortDirection = 'asc';
-        }
-        this.fetchEmployees();
-      },
-      toggleTrashed() {
-        if (this.includeTrashed === 'off') {
-          this.includeTrashed = 'on';
-        } else if (this.includeTrashed === 'on') {
-          this.includeTrashed = 'only_trashed';
-        } else {
-          this.includeTrashed = 'off';
-        }
-        this.fetchEmployees();
-      },
-      deleteEmployee(id) {
-        if (confirm('Are you sure you want to delete this employee?')) {
-          axios.delete(`/api/employees/${id}`).then(() => {
-            this.fetchEmployees();
-          });
-        }
-      },
-      restoreEmployee(id) {
-        axios.put(`/api/employees/${id}/restore`).then(() => {
-          this.fetchEmployees();
-        });
-      },
-      forceDeleteEmployee(id) {
-        if (confirm('Are you sure you want to permanently delete this employee?')) {
-          axios.delete(`/api/employees/${id}/force`).then(() => {
-            this.fetchEmployees();
-          });
-        }
-      },
-      async getAuthenticatedUser() {
-        const response = await axios.get('/api/user');
-        this.companyName = response.data.company.name;
-        this.isAdmin = response.data.isAdmin;
-      },
-    },
-    mounted() {
-      this.getAuthenticatedUser();
+  },mounted() {
       this.fetchEmployees();
     },
-  };
-  </script>
+  methods: {
+     fetchEmployees() {
+      axios
+        .get("http://127.0.0.1:8000/api/employees", {
+          params: {
+            query: this.query,
+            per_page: this.perPage,
+      include_trashed: this.includeTrashed,
+      sort: this.sort,
+      direction: this.direction,
+            page: this.currentPage,
+          },
+        })
+        .then((response) => {
+          this.employees = response.data.data;
+      this.currentPage = response.data.current_page;
+      this.totalPages = response.data.last_page;
+      this.isOnFirstPage = response.data.current_page === 1;
+      this.hasMorePages = response.data.next_page_url !== null;
+     // this.jsonstr = JSON.stringify(response.data.data, null, 2); // Update the JSON data
+          
+        })
+        .catch((error) => {
+          console.error("Error fetching companies:", error);
+        });
+    },
+    searchEmployees() {
+      
+      this.fetchEmployees();
+    },
+    changePage(page) {
+      this.currentPage = page;
+      this.fetchCompanies();
+    },
+    sortEmployees(field) {
+      if (this.sortField === field) {
+        this.sortDirection = this.sortDirection === "asc" ? "desc" : "asc";
+      } else {
+        this.sortField = field;
+        this.sortDirection = "asc";
+      }
+      this.fetchEmployees();
+    },
+    toggleTrashed() {
+      if (this.includeTrashed === "off") {
+        this.includeTrashed = "on";
+      } else if (this.includeTrashed === "on") {
+        this.includeTrashed = "only_trashed";
+      } else {
+        this.includeTrashed = "off";
+      }
+      this.fetchEmployees();
+    },
+    deleteEmployee(id) {
+      if (confirm("Are you sure you want to delete this employee?")) {
+        axios
+          .delete(`/api/employees/${id}`)
+          .then(() => {
+            this.fetchEmployees();
+          })
+          .catch((error) => {
+            console.error("Error deleting employee:", error);
+          });
+      }
+    },
+    restoreEmployee(id) {
+      axios
+        .put(`/api/employees/${id}/restore`)
+        .then(() => {
+          this.fetchEmployees();
+        })
+        .catch((error) => {
+          console.error("Error restoring employee:", error);
+        });
+    },
+    forceDeleteEmployee(id) {
+      if (confirm("Are you sure you want to permanently delete this employee?")) {
+        axios
+          .delete(`/api/employees/${id}/force`)
+          .then(() => {
+            this.fetchEmployees();
+          })
+          .catch((error) => {
+            console.error("Error force deleting employee:", error);
+          });
+      }
+    },
+    
+  },
+  mounted() {
+    
+    this.fetchEmployees();
+  },
+};
+</script>
+
   

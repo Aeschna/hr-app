@@ -16,6 +16,10 @@ use App\Http\Controllers\DashboardController;
 //Route::view('{any}','app')->where('any','*');
 // Home route
 Route::get('/', [DashboardController::class, 'index'])->name('home');
+Route::get('/companies', [CompanyController::class, 'index']);
+Route::get('/employees', [EmployeeController::class, 'index']);
+
+
 
 // Search routes
 Route::get('/companies/search', [CompanyController::class, 'search'])->name('companies.search');

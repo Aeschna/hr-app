@@ -2,7 +2,12 @@
     <div class="container">
       <h2>Companies</h2>
       <router-link to="/companies/create" class="btn btn-primary">Add Company</router-link>
-  
+    
+
+
+
+
+    
       <!-- Search Form -->
       <form @submit.prevent="searchCompanies" class="mt-3">
         <div class="input-group mb-3">
@@ -100,12 +105,7 @@
         </tbody>
       </table>
   
-      <!-- JSON Pretty Display Section -->
-      <div class="mt-5">
-        <h3>Raw JSON Data</h3>
-        <pre>{{ prettyJson }}</pre>
-      </div>
-  
+      
       <!-- Pagination -->
       <nav aria-label="Page navigation">
         <ul class="pagination pagination-sm justify-content-center">
@@ -137,15 +137,14 @@
   </template>
   
   <script>
-  import axios from "axios";
-  
-  export default {
-    name: 'app',
-    data() {
-      return {
-        companies: [],
-        query: "",
-        perPage: 10,
+import axios from "axios";
+
+export default {
+  data() {
+    return {
+      companies: [],
+      query: "",
+      perPage: 10,
         perPageOptions: [10, 20, 50],
         includeTrashed: "off",
         sort: "name",
@@ -155,9 +154,12 @@
         isOnFirstPage: true,
         hasMorePages: false,
         jsonstr: '{}'
-      };
-    },
-    computed: {
+    };
+  },
+  created() {
+    this.fetchCompanies();
+  },
+  computed: {
       prettyJson() {
         try {
           const data = JSON.parse(this.jsonstr);
@@ -170,52 +172,38 @@
     mounted() {
       this.fetchCompanies();
     },
-    methods: {
-  async fetchCompanies() {
-    this.loading = true;  // Start loading
-    const params = {
-      query: this.query,
-      per_page: this.perPage,
+
+  methods: {
+    fetchCompanies() {
+      axios
+        .get("http://127.0.0.1:8000/api/companies", {
+          params: {
+            query: this.query,
+            per_page: this.perPage,
       include_trashed: this.includeTrashed,
       sort: this.sort,
       direction: this.direction,
-      page: this.currentPage,
-    };
-
-    try {
-      const response = await axios.get('/api/companies', { params });
-
-      // Extract the token from the response and store it in localStorage
-      const token = response.data.token;
-      
-
-      this.companies = response.data.companies.data;
-      this.currentPage = response.data.companies.current_page;
-      this.totalPages = response.data.companies.last_page;
-      this.isOnFirstPage = response.data.companies.current_page === 1;
-      this.hasMorePages = response.data.companies.next_page_url !== null;
-      this.jsonstr = JSON.stringify(response.data.companies.data, null, 2); // Update the JSON data
-    } catch (error) {
-      if (error.response) {
-        // Error response from server
-        console.error(`Error fetching companies: ${error.response.status} ${error.response.statusText}`);
-      } else if (error.request) {
-        // No response received
-        console.error("Error fetching companies: No response received.");
-      } else {
-        // Error setting up the request
-        console.error("Error fetching companies:", error.message);
-      }
-    } finally {
-      this.loading = false;  // End loading
-    }
-  },
-
-
+            page: this.currentPage,
+          },
+        })
+        .then((response) => {
+          this.companies = response.data.data;
+      this.currentPage = response.data.current_page;
+      this.totalPages = response.data.last_page;
+      this.isOnFirstPage = response.data.current_page === 1;
+      this.hasMorePages = response.data.next_page_url !== null;
+     // this.jsonstr = JSON.stringify(response.data.data, null, 2); // Update the JSON data
+          
+        })
+        .catch((error) => {
+          console.error("Error fetching companies:", error);
+        });
+    },
     searchCompanies() {
       this.currentPage = 1;
       this.fetchCompanies();
     },
+
     sortCompanies(column) {
       this.direction =
         this.sort === column && this.direction === "asc" ? "desc" : "asc";
@@ -251,7 +239,7 @@
     deleteCompany(id) {
       if (confirm("Are you sure you want to delete this company?")) {
         axios
-          .delete(`/api/companies/${id}`)
+          .delete(`http://127.0.0.1:8000/api/companies/${id}`)
           .then(() => {
             this.fetchCompanies();
           })
@@ -281,6 +269,9 @@
             console.error("Error force deleting company:", error);
           });
       }
+    },
+    editCompany(id) {
+      this.$router.push({ name: 'edit-company', params: { id: id } });
     },
   },
 };
